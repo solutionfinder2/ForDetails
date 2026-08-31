@@ -1,0 +1,1918 @@
+# =============================================================
+# scrEventDetails - Full event detail page (RESPONSIVE, MODERN CONTROLS)
+# Drill-in page (no sidebar) reached from Home event cards, the
+# Register wizard, My Registrations, and the confirmation modal.
+# Navigate here with:
+#   Set(varDetailEventID, <event ID>); Navigate(scrEventDetails, ScreenTransition.Fade)
+# The Back button returns to whichever screen the user came from.
+# =============================================================
+Screens:
+  scrEventDetails:
+    Properties:
+      Fill: =RGBA(246, 247, 251, 1)
+      LoadingSpinnerColor: =RGBA(55, 63, 75, 1)
+      OnVisible: |-
+        =Set(varEventDetail, LookUp(EventSessionRegistration_Events, ID = varDetailEventID));
+        ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+        ClearCollect(colEventDetailSlots, Filter(EventSessionRegistration_SessionTimeSlots, EventID = varDetailEventID, IsActive = true, SessionDate >= Today()));
+        ClearCollect(colMyEvRegs_EvD, SortByColumns(Filter(EventSessionRegistration_Registrations, EventID = varDetailEventID, UserEmail = Lower(User().Email), Status = "Confirmed"), "SessionDate", SortOrder.Ascending));
+        Set(varEvDetSelSlot, Blank());
+        Set(varEvDetView, "calendar");
+        Set(varEvDetCalSel, Coalesce(First(SortByColumns(colEventDetailSlots, "SessionDate", SortOrder.Ascending)).SessionDate, Today()));
+        Set(varEvDetCalMonth, Date(Year(varEvDetCalSel), Month(varEvDetCalSel), 1))
+    Children:
+      - imgBackground_EvD:
+          Control: Image
+          Properties:
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            ImagePosition: =ImagePosition.Fill
+      - conRoot_EvD:
+          Control: GroupContainer
+          Variant: AutoLayout
+          Properties:
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutGap: =14
+            PaddingTop: =20
+            PaddingBottom: =20
+            PaddingLeft: =28
+            PaddingRight: =28
+            Fill: =RGBA(0, 0, 0, 0)
+            DropShadow: =DropShadow.None
+          Children:
+            # ---------------- HEADER: back + title ----------------
+            - conHeader_EvD:
+                Control: GroupContainer
+                Variant: AutoLayout
+                Properties:
+                  Height: =44
+                  FillPortions: =0
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutGap: =14
+                  Fill: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                Children:
+                  - btnBack_EvD:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Text: ="← Back"
+                        Width: =96
+                        Height: =40
+                        FillPortions: =0
+                        Size: =14
+                        FontWeight: =FontWeight.Semibold
+                        Appearance: =ButtonAppearance.Secondary
+                        BasePaletteColor: =RGBA(55, 63, 75, 1)
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        OnSelect: |-
+                          =If(varDeepEvent,
+                              Set(varDeepEvent, false); Navigate(scrHome, ScreenTransition.Fade),
+                              Back(ScreenTransition.Fade))
+                  - lblHeader_EvD:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: ="Event Details"
+                        Height: =40
+                        FillPortions: =1
+                        Size: =18
+                        FontWeight: =FontWeight.Bold
+                        Color: =RGBA(23, 32, 51, 1)
+                  - btnShare_EvD:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Text: ="↗ Share"
+                        Width: =110
+                        Height: =40
+                        FillPortions: =0
+                        Size: =14
+                        FontWeight: =FontWeight.Semibold
+                        Appearance: =ButtonAppearance.Secondary
+                        BasePaletteColor: =RGBA(55, 63, 75, 1)
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        Visible: =!IsBlank(varEventDetail)
+                        OnSelect: =Clear(colShareEvTo); Reset(txtShareEvSearch); Set(varShowShareEv, true)
+                  - lblStatusChip_EvD:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: |-
+                          =If(IsBlank(varEventDetail), "",
+                              varEventDetail.StartDate > Today(), "Upcoming",
+                              varEventDetail.EndDate >= Today(), "In Progress",
+                              "Ended")
+                        Width: =120
+                        Height: =30
+                        AutoHeight: =true
+                        FillPortions: =0
+                        Size: =13
+                        FontWeight: =FontWeight.Semibold
+                        Align: =Align.Center
+                        Fill: |-
+                          =If(IsBlank(varEventDetail), RGBA(0, 0, 0, 0),
+                              varEventDetail.StartDate > Today(), RGBA(233, 248, 241, 1),
+                              varEventDetail.EndDate >= Today(), RGBA(255, 244, 223, 1),
+                              RGBA(238, 240, 246, 1))
+                        Color: |-
+                          =If(IsBlank(varEventDetail), RGBA(0, 0, 0, 0),
+                              varEventDetail.StartDate > Today(), RGBA(21, 150, 106, 1),
+                              varEventDetail.EndDate >= Today(), RGBA(199, 122, 0, 1),
+                              RGBA(104, 115, 138, 1))
+                        RadiusTopLeft: =15
+                        RadiusTopRight: =15
+                        RadiusBottomLeft: =15
+                        RadiusBottomRight: =15
+            # ---------------- BODY: two columns ----------------
+            - conBody_EvD:
+                Control: GroupContainer
+                Variant: AutoLayout
+                Properties:
+                  FillPortions: =1
+                  AlignInContainer: =AlignInContainer.Stretch
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutGap: =16
+                  LayoutWrap: =true
+                  Fill: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                Children:
+                  # LEFT column: hero + sessions
+                  - conLeftCol_EvD:
+                      Control: GroupContainer
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =2
+                        LayoutMinWidth: =420
+                        AlignInContainer: =AlignInContainer.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutGap: =14
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        # Hero card
+                        - conHero_EvD:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              Height: =304
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutGap: =6
+                              PaddingTop: =20
+                              PaddingBottom: =16
+                              PaddingLeft: =22
+                              PaddingRight: =22
+                              Fill: =RGBA(255, 255, 255, 1)
+                              BorderColor: =RGBA(228, 231, 239, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              RadiusTopLeft: =13
+                              RadiusTopRight: =13
+                              RadiusBottomLeft: =13
+                              RadiusBottomRight: =13
+                            Children:
+                              - lblEvName_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =If(IsBlank(varEventDetail), "Event not found", varEventDetail.Title)
+                                    Height: =32
+                                    AutoHeight: =true
+                                    FillPortions: =0
+                                    Size: =18
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblEvMeta_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =If(IsBlank(varEventDetail), "",
+                                          Text(varEventDetail.StartDate, "ddd, mmm d") & " – " & Text(varEventDetail.EndDate, "ddd, mmm d, yyyy") &
+                                          If(IsBlank(varEventDetail.EventType), "", "  ·  " & varEventDetail.EventType) &
+                                          If(IsBlank(varEventDetail.Location), "", "  ·  ⌖ " & varEventDetail.Location) &
+                                          If(IsBlank(varEventDetail.Department), "", "  ·  " & varEventDetail.Department))
+                                    Height: =24
+                                    AutoHeight: =true
+                                    FillPortions: =0
+                                    Size: =13
+                                    FontWeight: =FontWeight.Semibold
+                                    Color: =RGBA(55, 63, 75, 1)
+                              - recHeroDiv_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =""
+                                    Height: =1
+                                    FillPortions: =0
+                                    Fill: =RGBA(228, 231, 239, 1)
+                              - lblMyRegHead_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      ="My Registration" & If(CountRows(colMyEvRegs_EvD) > 1, "s (" & CountRows(colMyEvRegs_EvD) & ")", "")
+                                    Height: =24
+                                    AutoHeight: =true
+                                    FillPortions: =0
+                                    Size: =14
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblNoMyReg_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="You haven't registered for this event yet. Pick a session below to register."
+                                    Height: =48
+                                    AutoHeight: =true
+                                    FillPortions: =0
+                                    Size: =13
+                                    Wrap: =true
+                                    Align: =Align.Center
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Color: =RGBA(104, 115, 138, 1)
+                                    Fill: =RGBA(246, 247, 251, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    Visible: =IsEmpty(colMyEvRegs_EvD)
+                              - galMyEvRegs_EvD:
+                                  Control: Gallery
+                                  Variant: Horizontal
+                                  Properties:
+                                    FillPortions: =1
+                                    LayoutMinHeight: =0
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    TemplateSize: =330
+                                    TemplatePadding: =4
+                                    ShowScrollbar: =false
+                                    Visible: =!IsEmpty(colMyEvRegs_EvD)
+                                    Items: =colMyEvRegs_EvD
+                                  Children:
+                                    - recMyRegCard_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =""
+                                          X: =0
+                                          Y: =2
+                                          Width: =Parent.TemplateWidth - 10
+                                          Height: =Parent.TemplateHeight - 6
+                                          Fill: =RGBA(246, 247, 251, 1)
+                                          BorderColor: =RGBA(228, 231, 239, 1)
+                                          BorderThickness: =1
+                                          RadiusTopLeft: =10
+                                          RadiusTopRight: =10
+                                          RadiusBottomLeft: =10
+                                          RadiusBottomRight: =10
+                                    - recMyRegDateBox_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =""
+                                          X: =12
+                                          Y: =14
+                                          Width: =48
+                                          Height: =48
+                                          Fill: =RGBA(232, 234, 238, 1)
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                    - lblMyRegMon_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =Upper(Text(ThisItem.SessionDate, "mmm"))
+                                          X: =12
+                                          Y: =18
+                                          Width: =48
+                                          Height: =16
+                                          AutoHeight: =true
+                                          Size: =10
+                                          FontWeight: =FontWeight.Bold
+                                          Align: =Align.Center
+                                          Color: =RGBA(55, 63, 75, 1)
+                                    - lblMyRegDay_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =Text(ThisItem.SessionDate, "dd")
+                                          X: =12
+                                          Y: =33
+                                          Width: =48
+                                          Height: =24
+                                          AutoHeight: =true
+                                          Size: =14
+                                          FontWeight: =FontWeight.Bold
+                                          Align: =Align.Center
+                                          Color: =RGBA(55, 63, 75, 1)
+                                    - lblMyRegBadge_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =If(ThisItem.SessionDate < Today(), "Past", "Confirmed ✓")
+                                          X: =Parent.TemplateWidth - 122
+                                          Y: =14
+                                          Width: =104
+                                          Height: =22
+                                          AutoHeight: =true
+                                          Size: =11
+                                          FontWeight: =FontWeight.Semibold
+                                          Align: =Align.Center
+                                          Fill: |-
+                                            =If(ThisItem.SessionDate < Today(),
+                                                RGBA(238, 240, 246, 1), RGBA(233, 248, 241, 1))
+                                          Color: |-
+                                            =If(ThisItem.SessionDate < Today(),
+                                                RGBA(104, 115, 138, 1), RGBA(21, 150, 106, 1))
+                                          RadiusTopLeft: =11
+                                          RadiusTopRight: =11
+                                          RadiusBottomLeft: =11
+                                          RadiusBottomRight: =11
+                                    - lblMyRegTime_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =Text(ThisItem.SessionDate, "ddd, mmm d")
+                                          X: =70
+                                          Y: =40
+                                          Width: =Parent.TemplateWidth - 200
+                                          Height: =20
+                                          AutoHeight: =true
+                                          Size: =12
+                                          FontWeight: =FontWeight.Bold
+                                          Color: =RGBA(23, 32, 51, 1)
+                                    - lblMyRegRef_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =ThisItem.TimeSlot & "  ·  WSR-" & Text(ThisItem.ID)
+                                          X: =70
+                                          Y: =62
+                                          Width: =Parent.TemplateWidth - 90
+                                          Height: =18
+                                          AutoHeight: =true
+                                          Size: =11
+                                          Color: =RGBA(104, 115, 138, 1)
+                                    - btnMyRegCancel_EvD:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Text: ="Cancel"
+                                          X: =12
+                                          Y: =Parent.TemplateHeight - 50
+                                          Width: =(Parent.TemplateWidth - 46) / 3
+                                          Height: =38
+                                          Size: =12
+                                          FontWeight: =FontWeight.Semibold
+                                          Appearance: =ButtonAppearance.Outline
+                                          Color: =RGBA(216, 75, 82, 1)
+                                          BorderColor: =RGBA(239, 183, 187, 1)
+                                          DisplayMode: =If(ThisItem.SessionDate < Today(), DisplayMode.Disabled, DisplayMode.Edit)
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          OnSelect: |-
+                                            =Set(varCancelTarget, ThisItem);
+                                            Set(varShowCancelEvD, true)
+                                    - btnMyRegSwitch_EvD:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Text: ="⇄ Switch"
+                                          X: =12 + (Parent.TemplateWidth - 46) / 3 + 6
+                                          Y: =Parent.TemplateHeight - 50
+                                          Width: =(Parent.TemplateWidth - 46) / 3
+                                          Height: =38
+                                          Size: =12
+                                          FontWeight: =FontWeight.Semibold
+                                          Appearance: =ButtonAppearance.Secondary
+                                          BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                          DisplayMode: =If(ThisItem.SessionDate < Today(), DisplayMode.Disabled, DisplayMode.Edit)
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          OnSelect: |-
+                                            =Set(varSwitchRegID, ThisItem.ID);
+                                            Set(varSwitchRegLabel, Text(ThisItem.SessionDate, "ddd, mmm d") & " · " & ThisItem.TimeSlot);
+                                            Set(varSelectedEvent,
+                                                {ID: varEventDetail.ID, Title: varEventDetail.Title, Description: varEventDetail.Description,
+                                                 StartDate: varEventDetail.StartDate, EndDate: varEventDetail.EndDate, Location: varEventDetail.Location,
+                                                 EventType: varEventDetail.EventType, CutoffHours: Coalesce(varEventDetail.RegistrationCutoffHours, 48),
+                                                 MaxPerUser: Coalesce(varEventDetail.MaxPerUser, 0), MeetingLink: varEventDetail.MeetingLink,
+                                                 Coordinator: varEventDetail.Coordinator, POC: varEventDetail.POC, POCEmail: varEventDetail.POCEmail});
+                                            Set(varDetailEvent, varSelectedEvent);
+                                            Set(varSelectedSlot, Blank());
+                                            Set(varCalDate, ThisItem.SessionDate);
+                                            Set(varDeepLink, true);
+                                            Navigate(scrRegister, ScreenTransition.Fade)
+                                    - btnMyRegAddCal_EvD:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Text: ="📅 Calendar"
+                                          X: =12 + 2 * ((Parent.TemplateWidth - 46) / 3 + 6)
+                                          Y: =Parent.TemplateHeight - 50
+                                          Width: =(Parent.TemplateWidth - 46) / 3
+                                          Height: =38
+                                          Size: =12
+                                          FontWeight: =FontWeight.Semibold
+                                          Appearance: =ButtonAppearance.Secondary
+                                          BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                          DisplayMode: =If(ThisItem.SessionDate < Today(), DisplayMode.Disabled, DisplayMode.Edit)
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          OnSelect: |-
+                                            =With({p: Split(ThisItem.TimeSlot, " – "),
+                                                  ml: Coalesce(varEventDetail.MeetingLink, ""),
+                                                  loc: Coalesce(varEventDetail.Location, "")},
+                                                With({startDT: ThisItem.SessionDate + IfError(TimeValue(First(p).Value), Time(9, 0, 0)),
+                                                      endDT: ThisItem.SessionDate + IfError(TimeValue(Last(p).Value), Time(15, 0, 0))},
+                                                    If(IsError(
+                                                        EventSessionRegistration_AddToCalendar.Run(
+                                                            Coalesce(ThisItem.EventName, "Session") & " - " & ThisItem.TimeSlot,
+                                                            "Your registered session." & Char(10) &
+                                                                "Event: " & Coalesce(ThisItem.EventName, "") & Char(10) &
+                                                                "Time: " & ThisItem.TimeSlot & Char(10) &
+                                                                "Reference: WSR-" & ThisItem.ID &
+                                                                If(ml = "", "", Char(10) & "Meeting link: " & ml),
+                                                            Text(startDT, "yyyy-mm-ddThh:mm:ss"),
+                                                            Text(endDT, "yyyy-mm-ddThh:mm:ss"),
+                                                            loc)),
+                                                        Notify("Could not add to your calendar. Check that the EventSessionRegistration_AddToCalendar flow is connected.", NotificationType.Error),
+                                                        Notify("Added to your Outlook calendar.", NotificationType.Success))))
+                        # Sessions card
+                        - conSessions_EvD:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =1
+                              AlignInContainer: =AlignInContainer.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutGap: =8
+                              PaddingTop: =16
+                              PaddingBottom: =12
+                              PaddingLeft: =22
+                              PaddingRight: =22
+                              Fill: =RGBA(255, 255, 255, 1)
+                              BorderColor: =RGBA(228, 231, 239, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              RadiusTopLeft: =13
+                              RadiusTopRight: =13
+                              RadiusBottomLeft: =13
+                              RadiusBottomRight: =13
+                            Children:
+                              - conSessHead_EvD:
+                                  Control: GroupContainer
+                                  Variant: AutoLayout
+                                  Properties:
+                                    Height: =40
+                                    FillPortions: =0
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutAlignItems: =LayoutAlignItems.Center
+                                    LayoutGap: =8
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    DropShadow: =DropShadow.None
+                                  Children:
+                                    - lblSessionsHead_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: ="Upcoming Sessions (" & CountRows(colEventDetailSlots) & ")"
+                                          Height: =28
+                                          FillPortions: =1
+                                          Size: =13
+                                          FontWeight: =FontWeight.Bold
+                                          Color: =RGBA(23, 32, 51, 1)
+                                    - htmlLegend_EvD:
+                                        Control: HtmlViewer@2.1.0
+                                        Properties:
+                                          HtmlText: |-
+                                            ="<div style='line-height:34px;white-space:nowrap;text-align:right'>" &
+                                            "<span style='color:#373F4B'>&#9679;</span> Registered &nbsp; " &
+                                            "<span style='color:#15966A'>&#9679;</span> Open &nbsp; " &
+                                            "<span style='color:#C77A00'>&#9679;</span> Few spots &nbsp; " &
+                                            "<span style='color:#D84B52'>&#9679;</span> Full</div>"
+                                          Width: =330
+                                          Height: =34
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =11
+                                          Font: =Font.'Segoe UI'
+                                          Color: =RGBA(104, 115, 138, 1)
+                                          BorderStyle: =BorderStyle.None
+                                          PaddingLeft: =0
+                                          PaddingRight: =0
+                                          PaddingTop: =0
+                                          PaddingBottom: =0
+                                    - btnEvListView_EvD:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Text: ="☷ List"
+                                          Width: =80
+                                          Height: =34
+                                          FillPortions: =0
+                                          Size: =13
+                                          Appearance: =If(varEvDetView = "calendar", ButtonAppearance.Secondary, ButtonAppearance.Primary)
+                                          BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          OnSelect: =Set(varEvDetView, "list")
+                                    - btnEvCalView_EvD:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Text: ="▦ Calendar"
+                                          Width: =110
+                                          Height: =34
+                                          FillPortions: =0
+                                          Size: =13
+                                          Appearance: =If(varEvDetView = "calendar", ButtonAppearance.Primary, ButtonAppearance.Secondary)
+                                          BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          OnSelect: =Set(varEvDetView, "calendar")
+                              - lblNoSlots_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="No upcoming sessions have been scheduled for this event yet. Check back soon."
+                                    Height: =48
+                                    AutoHeight: =true
+                                    FillPortions: =0
+                                    Size: =13
+                                    Wrap: =true
+                                    Align: =Align.Center
+                                    Color: =RGBA(104, 115, 138, 1)
+                                    Fill: =RGBA(246, 247, 251, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    Visible: =IsEmpty(colEventDetailSlots)
+                              - galEvSlots_EvD:
+                                  Control: Gallery
+                                  Variant: Vertical
+                                  Properties:
+                                    FillPortions: =1
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    TemplateSize: =56
+                                    TemplatePadding: =0
+                                    ShowScrollbar: =false
+                                    OnSelect: =Set(varEvDetSelSlot, ThisItem)
+                                    Visible: =varEvDetView <> "calendar" && !IsEmpty(colEventDetailSlots)
+                                    Items: |-
+                                      =AddColumns(
+                                          SortByColumns(colEventDetailSlots, "SessionDate", SortOrder.Ascending, "SortOrder", SortOrder.Ascending),
+                                          Registered, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId))),
+                                          Mine, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId, UserEmail = Lower(User().Email)))),
+                                          SlotStart, If(IsBlank(ThisRecord.DurationMinutes),
+                                              DateAdd(ThisRecord.SessionDate, Switch(ThisRecord.SortOrder, 1, 9, 2, 10, 3, 11, 4, 13, 5, 14, 9), TimeUnit.Hours),
+                                              DateAdd(ThisRecord.SessionDate, ThisRecord.SortOrder, TimeUnit.Minutes)),
+                                          CutoffH, Coalesce(varEventDetail.RegistrationCutoffHours, 48))
+                                  Children:
+                                    - lblSlotDate_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =Text(ThisItem.SessionDate, "ddd, mmm d, yyyy")
+                                          X: =4
+                                          Y: =14
+                                          Width: =Parent.TemplateWidth * 0.26
+                                          Height: =28
+                                          AutoHeight: =true
+                                          Size: =13
+                                          FontWeight: =If(varEvDetSelSlot.ID = ThisItem.ID, FontWeight.Bold, FontWeight.Normal)
+                                          Color: =RGBA(23, 32, 51, 1)
+                                          OnSelect: =Select(Parent)
+                                    - lblSlotTime_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =ThisItem.Title
+                                          X: =Parent.TemplateWidth * 0.28
+                                          Y: =14
+                                          Width: =Parent.TemplateWidth * 0.24
+                                          Height: =28
+                                          AutoHeight: =true
+                                          Size: =13
+                                          FontWeight: =FontWeight.Bold
+                                          Color: =RGBA(23, 32, 51, 1)
+                                          OnSelect: =Select(Parent)
+                                    - lblSlotBadge_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: |-
+                                            =If(ThisItem.Mine > 0, "Registered ✓",
+                                                ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), "Closed",
+                                                With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                    If(left = 0, "Full", left & " spots left")))
+                                          X: =Parent.TemplateWidth * 0.54
+                                          Y: =15
+                                          Width: =120
+                                          Height: =26
+                                          AutoHeight: =true
+                                          Size: =12
+                                          FontWeight: =FontWeight.Semibold
+                                          Align: =Align.Center
+                                          Fill: |-
+                                            =If(ThisItem.Mine > 0, RGBA(55, 63, 75, 1),
+                                                ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(238, 240, 246, 1),
+                                                With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                    If(left = 0, RGBA(253, 236, 238, 1),
+                                                       left <= 4, RGBA(255, 244, 223, 1),
+                                                       RGBA(233, 248, 241, 1))))
+                                          Color: |-
+                                            =If(ThisItem.Mine > 0, RGBA(255, 255, 255, 1),
+                                                ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(104, 115, 138, 1),
+                                                With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                    If(left = 0, RGBA(216, 75, 82, 1),
+                                                       left <= 4, RGBA(199, 122, 0, 1),
+                                                       RGBA(21, 150, 106, 1))))
+                                          RadiusTopLeft: =13
+                                          RadiusTopRight: =13
+                                          RadiusBottomLeft: =13
+                                          RadiusBottomRight: =13
+                                          OnSelect: =Select(Parent)
+                                    - btnSlotRegister_EvD:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Text: |-
+                                            =If(ThisItem.Mine > 0, "⇄ Switch",
+                                                ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), "Closed",
+                                                ThisItem.Registered >= ThisItem.Capacity, "Full",
+                                                "Register")
+                                          X: =Parent.TemplateWidth - 120
+                                          Y: =12
+                                          Width: =110
+                                          Height: =32
+                                          Size: =13
+                                          Appearance: =If(ThisItem.Mine > 0, ButtonAppearance.Secondary, ButtonAppearance.Primary)
+                                          BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                          DisplayMode: |-
+                                            =If(ThisItem.Mine > 0,
+                                                If(ThisItem.SlotStart < Now(), DisplayMode.Disabled, DisplayMode.Edit),
+                                                ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours) ||
+                                                ThisItem.Registered >= ThisItem.Capacity,
+                                                DisplayMode.Disabled, DisplayMode.Edit)
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          OnSelect: |-
+                                            =If(ThisItem.Mine > 0,
+                                                With({r: LookUp(colFutureRegs, SlotID = ThisItem.ID && UserEmail = Lower(User().Email))},
+                                                    Set(varSwitchRegID, r.ID);
+                                                    Set(varSwitchRegLabel, Text(r.SessionDate, "ddd, mmm d") & " · " & r.TimeSlot)),
+                                                Set(varSwitchRegID, 0));
+                                            Set(varSelectedEvent,
+                                                {ID: varEventDetail.ID, Title: varEventDetail.Title, Description: varEventDetail.Description,
+                                                 StartDate: varEventDetail.StartDate, EndDate: varEventDetail.EndDate, Location: varEventDetail.Location,
+                                                 EventType: varEventDetail.EventType, CutoffHours: Coalesce(varEventDetail.RegistrationCutoffHours, 48),
+                                                 MaxPerUser: Coalesce(varEventDetail.MaxPerUser, 0), MeetingLink: varEventDetail.MeetingLink,
+                                                 Coordinator: varEventDetail.Coordinator, POC: varEventDetail.POC, POCEmail: varEventDetail.POCEmail});
+                                            Set(varDetailEvent, varSelectedEvent);
+                                            Set(varSelectedSlot,
+                                                If(ThisItem.Mine > 0, Blank(),
+                                                    {ID: ThisItem.ID, Title: ThisItem.Title, SessionDate: ThisItem.SessionDate,
+                                                     Capacity: ThisItem.Capacity, EventID: ThisItem.EventID, EventName: ThisItem.EventName,
+                                                     SortOrder: ThisItem.SortOrder, DurationMinutes: ThisItem.DurationMinutes,
+                                                     Registered: ThisItem.Registered, Mine: ThisItem.Mine, SlotStart: ThisItem.SlotStart}));
+                                            Set(varCalDate, ThisItem.SessionDate);
+                                            Set(varDeepLink, true);
+                                            Navigate(scrRegister, ScreenTransition.Fade)
+                                    - recSlotDivider_EvD:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =""
+                                          X: =0
+                                          Y: =55
+                                          Width: =Parent.TemplateWidth
+                                          Height: =1
+                                          Fill: =RGBA(238, 240, 245, 1)
+                              # ---------------- CALENDAR VIEW ----------------
+                              - conEvCal_EvD:
+                                  Control: GroupContainer
+                                  Variant: AutoLayout
+                                  Properties:
+                                    FillPortions: =1
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    LayoutDirection: =LayoutDirection.Horizontal
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutGap: =16
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    DropShadow: =DropShadow.None
+                                    Visible: =varEvDetView = "calendar"
+                                  Children:
+                                    # LEFT: month calendar
+                                    - conCalLeft_EvD:
+                                        Control: GroupContainer
+                                        Variant: AutoLayout
+                                        Properties:
+                                          FillPortions: =3
+                                          LayoutMinWidth: =360
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutGap: =4
+                                          Fill: =RGBA(0, 0, 0, 0)
+                                          DropShadow: =DropShadow.None
+                                        Children:
+                                          # Month navigation
+                                          - conCalNav_EvD:
+                                              Control: GroupContainer
+                                              Variant: AutoLayout
+                                              Properties:
+                                                Height: =40
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutGap: =8
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                DropShadow: =DropShadow.None
+                                              Children:
+                                                - btnCalPrev_EvD:
+                                                    Control: ModernButton@1.0.0
+                                                    Properties:
+                                                      Text: ="‹"
+                                                      Width: =40
+                                                      Height: =34
+                                                      FillPortions: =0
+                                                      Size: =12
+                                                      Appearance: =ButtonAppearance.Secondary
+                                                      BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                                      RadiusTopLeft: =8
+                                                      RadiusTopRight: =8
+                                                      RadiusBottomLeft: =8
+                                                      RadiusBottomRight: =8
+                                                      OnSelect: =Set(varEvDetCalMonth, DateAdd(varEvDetCalMonth, -1, TimeUnit.Months))
+                                                - lblCalMonth_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =Text(varEvDetCalMonth, "mmmm yyyy")
+                                                      Height: =34
+                                                      FillPortions: =1
+                                                      Size: =12
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Center
+                                                      Color: =RGBA(23, 32, 51, 1)
+                                                - btnCalToday_EvD:
+                                                    Control: ModernButton@1.0.0
+                                                    Properties:
+                                                      Text: ="Today"
+                                                      Width: =72
+                                                      Height: =34
+                                                      FillPortions: =0
+                                                      Size: =12
+                                                      Appearance: =ButtonAppearance.Secondary
+                                                      BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                                      RadiusTopLeft: =8
+                                                      RadiusTopRight: =8
+                                                      RadiusBottomLeft: =8
+                                                      RadiusBottomRight: =8
+                                                      OnSelect: |-
+                                                        =Set(varEvDetCalSel, Today());
+                                                        Set(varEvDetCalMonth, Date(Year(Today()), Month(Today()), 1))
+                                                - btnCalNext_EvD:
+                                                    Control: ModernButton@1.0.0
+                                                    Properties:
+                                                      Text: ="›"
+                                                      Width: =40
+                                                      Height: =34
+                                                      FillPortions: =0
+                                                      Size: =12
+                                                      Appearance: =ButtonAppearance.Secondary
+                                                      BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                                      RadiusTopLeft: =8
+                                                      RadiusTopRight: =8
+                                                      RadiusBottomLeft: =8
+                                                      RadiusBottomRight: =8
+                                                      OnSelect: =Set(varEvDetCalMonth, DateAdd(varEvDetCalMonth, 1, TimeUnit.Months))
+                                          # Weekday header (Sun–Sat)
+                                          - galCalWeekdays_EvD:
+                                              Control: Gallery
+                                              Variant: Horizontal
+                                              Properties:
+                                                Height: =24
+                                                FillPortions: =0
+                                                AlignInContainer: =AlignInContainer.Stretch
+                                                TemplateSize: =RoundDown(Self.Width / 7, 0)
+                                                TemplatePadding: =0
+                                                ShowScrollbar: =false
+                                                Items: =["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+                                              Children:
+                                                - lblWeekday_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =ThisItem.Value
+                                                      X: =0
+                                                      Y: =0
+                                                      Width: =Parent.TemplateWidth
+                                                      Height: =22
+                                                      AutoHeight: =true
+                                                      Size: =11
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Align: =Align.Center
+                                                      Color: =RGBA(104, 115, 138, 1)
+                                          # Month grid: 6 weeks x 7 days (42 cells)
+                                          - galCalGrid_EvD:
+                                              Control: Gallery
+                                              Variant: Vertical
+                                              Properties:
+                                                FillPortions: =1
+                                                AlignInContainer: =AlignInContainer.Stretch
+                                                WrapCount: =7
+                                                TemplateSize: =Max(34, RoundDown(Self.Height / 6, 0))
+                                                TemplatePadding: =2
+                                                ShowScrollbar: =false
+                                                Items: |-
+                                                  =With({som: Date(Year(varEvDetCalMonth), Month(varEvDetCalMonth), 1)},
+                                                      With({first: DateAdd(som, 1 - Weekday(som), TimeUnit.Days)},
+                                                          AddColumns(Sequence(42),
+                                                              DayDate, DateAdd(first, Value - 1, TimeUnit.Days),
+                                                              SlotCount, With({d: DateAdd(first, Value - 1, TimeUnit.Days)},
+                                                                  CountRows(Filter(colEventDetailSlots, SessionDate = d))),
+                                                              MineDay, With({d: DateAdd(first, Value - 1, TimeUnit.Days)},
+                                                                  CountRows(Filter(colMyEvRegs_EvD, SessionDate = d))),
+                                                              RemainDay, With({d: DateAdd(first, Value - 1, TimeUnit.Days)},
+                                                                  Sum(Filter(colEventDetailSlots, SessionDate = d),
+                                                                      With({slotId: ID}, Max(0, Capacity - CountRows(Filter(colFutureRegs, SlotID = slotId)))))))))
+                                              Children:
+                                                - recCalCell_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =""
+                                                      X: =1
+                                                      Y: =1
+                                                      Width: =Parent.TemplateWidth - 4
+                                                      Height: =Parent.TemplateHeight - 4
+                                                      Fill: |-
+                                                        =If(ThisItem.DayDate = varEvDetCalSel, RGBA(55, 63, 75, 1),
+                                                            ThisItem.SlotCount > 0, RGBA(233, 248, 241, 1),
+                                                            ThisItem.DayDate = Today(), RGBA(238, 240, 246, 1),
+                                                            RGBA(255, 255, 255, 1))
+                                                      BorderColor: |-
+                                                        =If(ThisItem.DayDate = varEvDetCalSel, RGBA(55, 63, 75, 1),
+                                                            ThisItem.DayDate = Today(), RGBA(55, 63, 75, 1),
+                                                            RGBA(238, 240, 245, 1))
+                                                      BorderThickness: =1
+                                                      RadiusTopLeft: =8
+                                                      RadiusTopRight: =8
+                                                      RadiusBottomLeft: =8
+                                                      RadiusBottomRight: =8
+                                                - lblCalDayNum_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =Text(Day(ThisItem.DayDate))
+                                                      X: =1
+                                                      Y: =4
+                                                      Width: =Parent.TemplateWidth - 4
+                                                      Height: =20
+                                                      AutoHeight: =true
+                                                      Size: =12
+                                                      FontWeight: =If(ThisItem.DayDate = Today() || ThisItem.DayDate = varEvDetCalSel, FontWeight.Bold, FontWeight.Normal)
+                                                      Align: =Align.Center
+                                                      Color: |-
+                                                        =If(ThisItem.DayDate = varEvDetCalSel, RGBA(255, 255, 255, 1),
+                                                            Month(ThisItem.DayDate) <> Month(varEvDetCalMonth), RGBA(190, 195, 206, 1),
+                                                            RGBA(23, 32, 51, 1))
+                                                - lblCalDayDot_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: |-
+                                                        =If(ThisItem.SlotCount > 0,
+                                                            ThisItem.SlotCount & " session" & If(ThisItem.SlotCount > 1, "s", ""), "")
+                                                      X: =4
+                                                      Y: =Parent.TemplateHeight - 26
+                                                      Width: =Parent.TemplateWidth - 12
+                                                      Height: =18
+                                                      AutoHeight: =true
+                                                      Size: =10
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Center
+                                                      Visible: =ThisItem.SlotCount > 0
+                                                      Fill: |-
+                                                        =If(ThisItem.DayDate = varEvDetCalSel, RGBA(255, 255, 255, 1),
+                                                            ThisItem.MineDay > 0, RGBA(55, 63, 75, 1),
+                                                            ThisItem.RemainDay = 0, RGBA(253, 236, 238, 1),
+                                                            ThisItem.RemainDay <= 4, RGBA(255, 244, 223, 1),
+                                                            RGBA(233, 248, 241, 1))
+                                                      Color: |-
+                                                        =If(ThisItem.DayDate = varEvDetCalSel, RGBA(55, 63, 75, 1),
+                                                            ThisItem.MineDay > 0, RGBA(255, 255, 255, 1),
+                                                            ThisItem.RemainDay = 0, RGBA(216, 75, 82, 1),
+                                                            ThisItem.RemainDay <= 4, RGBA(199, 122, 0, 1),
+                                                            RGBA(21, 150, 106, 1))
+                                                      RadiusTopLeft: =9
+                                                      RadiusTopRight: =9
+                                                      RadiusBottomLeft: =9
+                                                      RadiusBottomRight: =9
+                                                - btnCalCell_EvD:
+                                                    Control: ModernButton@1.0.0
+                                                    Properties:
+                                                      Text: =""
+                                                      X: =1
+                                                      Y: =1
+                                                      Width: =Parent.TemplateWidth - 4
+                                                      Height: =Parent.TemplateHeight - 4
+                                                      Appearance: =ButtonAppearance.Transparent
+                                                      RadiusTopLeft: =8
+                                                      RadiusTopRight: =8
+                                                      RadiusBottomLeft: =8
+                                                      RadiusBottomRight: =8
+                                                      OnSelect: =Set(varEvDetCalSel, ThisItem.DayDate)
+                                    # RIGHT: selected day sessions
+                                    - conCalRight_EvD:
+                                        Control: GroupContainer
+                                        Variant: AutoLayout
+                                        Properties:
+                                          FillPortions: =2
+                                          LayoutMinWidth: =250
+                                          AlignInContainer: =AlignInContainer.Stretch
+                                          LayoutDirection: =LayoutDirection.Vertical
+                                          LayoutAlignItems: =LayoutAlignItems.Stretch
+                                          LayoutGap: =6
+                                          PaddingTop: =8
+                                          PaddingBottom: =8
+                                          PaddingLeft: =14
+                                          PaddingRight: =14
+                                          Fill: =RGBA(246, 247, 251, 1)
+                                          DropShadow: =DropShadow.None
+                                          RadiusTopLeft: =10
+                                          RadiusTopRight: =10
+                                          RadiusBottomLeft: =10
+                                          RadiusBottomRight: =10
+                                        Children:
+                                          - lblCalSelHead_EvD:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Text: ="Sessions on " & Text(varEvDetCalSel, "ddd, mmm d, yyyy")
+                                                Height: =26
+                                                AutoHeight: =true
+                                                FillPortions: =0
+                                                Size: =13
+                                                FontWeight: =FontWeight.Bold
+                                                Color: =RGBA(23, 32, 51, 1)
+                                          - lblCalNoSlots_EvD:
+                                              Control: ModernText@1.0.0
+                                              Properties:
+                                                Text: ="No sessions on this day. Pick a day with a session badge on the calendar."
+                                                Height: =52
+                                                AutoHeight: =true
+                                                FillPortions: =0
+                                                Size: =12
+                                                Wrap: =true
+                                                Align: =Align.Center
+                                                Color: =RGBA(104, 115, 138, 1)
+                                                Fill: =RGBA(255, 255, 255, 1)
+                                                RadiusTopLeft: =8
+                                                RadiusTopRight: =8
+                                                RadiusBottomLeft: =8
+                                                RadiusBottomRight: =8
+                                                Visible: =CountRows(Filter(colEventDetailSlots, SessionDate = varEvDetCalSel)) = 0
+                                          - galCalDaySlots_EvD:
+                                              Control: Gallery
+                                              Variant: Vertical
+                                              Properties:
+                                                FillPortions: =1
+                                                AlignInContainer: =AlignInContainer.Stretch
+                                                TemplateSize: =78
+                                                TemplatePadding: =3
+                                                ShowScrollbar: =false
+                                                OnSelect: =Set(varEvDetSelSlot, ThisItem)
+                                                Visible: =CountRows(Filter(colEventDetailSlots, SessionDate = varEvDetCalSel)) > 0
+                                                Items: |-
+                                                  =AddColumns(
+                                                      SortByColumns(Filter(colEventDetailSlots, SessionDate = varEvDetCalSel), "SortOrder", SortOrder.Ascending),
+                                                      Registered, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId))),
+                                                      Mine, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId, UserEmail = Lower(User().Email)))),
+                                                      SlotStart, If(IsBlank(ThisRecord.DurationMinutes),
+                                                          DateAdd(ThisRecord.SessionDate, Switch(ThisRecord.SortOrder, 1, 9, 2, 10, 3, 11, 4, 13, 5, 14, 9), TimeUnit.Hours),
+                                                          DateAdd(ThisRecord.SessionDate, ThisRecord.SortOrder, TimeUnit.Minutes)),
+                                                      CutoffH, Coalesce(varEventDetail.RegistrationCutoffHours, 48))
+                                              Children:
+                                                - recCalSlotCard_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =""
+                                                      X: =0
+                                                      Y: =0
+                                                      Width: =Parent.TemplateWidth
+                                                      Height: =72
+                                                      Fill: =RGBA(255, 255, 255, 1)
+                                                      BorderColor: |-
+                                                        =If(varEvDetSelSlot.ID = ThisItem.ID,
+                                                            RGBA(55, 63, 75, 1), RGBA(228, 231, 239, 1))
+                                                      BorderThickness: =If(varEvDetSelSlot.ID = ThisItem.ID, 2, 1)
+                                                      RadiusTopLeft: =8
+                                                      RadiusTopRight: =8
+                                                      RadiusBottomLeft: =8
+                                                      RadiusBottomRight: =8
+                                                      OnSelect: =Select(Parent)
+                                                - lblCalSlotTime_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =ThisItem.Title
+                                                      X: =12
+                                                      Y: =8
+                                                      Width: =Parent.TemplateWidth - 130
+                                                      Height: =24
+                                                      AutoHeight: =true
+                                                      Size: =13
+                                                      FontWeight: =FontWeight.Bold
+                                                      Color: =RGBA(23, 32, 51, 1)
+                                                      OnSelect: =Select(Parent)
+                                                - lblCalSlotBadge_EvD:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: |-
+                                                        =If(ThisItem.Mine > 0, "Registered ✓",
+                                                            ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), "Closed",
+                                                            With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                                If(left = 0, "Full", left & " spots left")))
+                                                      X: =12
+                                                      Y: =38
+                                                      Width: =110
+                                                      Height: =24
+                                                      AutoHeight: =true
+                                                      Size: =11
+                                                      FontWeight: =FontWeight.Semibold
+                                                      Align: =Align.Center
+                                                      Fill: |-
+                                                        =If(ThisItem.Mine > 0, RGBA(55, 63, 75, 1),
+                                                            ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(238, 240, 246, 1),
+                                                            With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                                If(left = 0, RGBA(253, 236, 238, 1),
+                                                                   left <= 4, RGBA(255, 244, 223, 1),
+                                                                   RGBA(233, 248, 241, 1))))
+                                                      Color: |-
+                                                        =If(ThisItem.Mine > 0, RGBA(255, 255, 255, 1),
+                                                            ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(104, 115, 138, 1),
+                                                            With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                                If(left = 0, RGBA(216, 75, 82, 1),
+                                                                   left <= 4, RGBA(199, 122, 0, 1),
+                                                                   RGBA(21, 150, 106, 1))))
+                                                      RadiusTopLeft: =12
+                                                      RadiusTopRight: =12
+                                                      RadiusBottomLeft: =12
+                                                      RadiusBottomRight: =12
+                                                      OnSelect: =Select(Parent)
+                                                - btnCalSlotReg_EvD:
+                                                    Control: ModernButton@1.0.0
+                                                    Properties:
+                                                      Text: |-
+                                                        =If(ThisItem.Mine > 0, "⇄ Switch",
+                                                            ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), "Closed",
+                                                            ThisItem.Registered >= ThisItem.Capacity, "Full",
+                                                            "Register")
+                                                      X: =Parent.TemplateWidth - 112
+                                                      Y: =21
+                                                      Width: =100
+                                                      Height: =30
+                                                      Size: =12
+                                                      Appearance: =If(ThisItem.Mine > 0, ButtonAppearance.Secondary, ButtonAppearance.Primary)
+                                                      BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                                      DisplayMode: |-
+                                                        =If(ThisItem.Mine > 0,
+                                                            If(ThisItem.SlotStart < Now(), DisplayMode.Disabled, DisplayMode.Edit),
+                                                            ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours) ||
+                                                            ThisItem.Registered >= ThisItem.Capacity,
+                                                            DisplayMode.Disabled, DisplayMode.Edit)
+                                                      RadiusTopLeft: =8
+                                                      RadiusTopRight: =8
+                                                      RadiusBottomLeft: =8
+                                                      RadiusBottomRight: =8
+                                                      OnSelect: |-
+                                                        =If(ThisItem.Mine > 0,
+                                                            With({r: LookUp(colFutureRegs, SlotID = ThisItem.ID && UserEmail = Lower(User().Email))},
+                                                                Set(varSwitchRegID, r.ID);
+                                                                Set(varSwitchRegLabel, Text(r.SessionDate, "ddd, mmm d") & " · " & r.TimeSlot)),
+                                                            Set(varSwitchRegID, 0));
+                                                        Set(varSelectedEvent,
+                                                            {ID: varEventDetail.ID, Title: varEventDetail.Title, Description: varEventDetail.Description,
+                                                             StartDate: varEventDetail.StartDate, EndDate: varEventDetail.EndDate, Location: varEventDetail.Location,
+                                                             EventType: varEventDetail.EventType, CutoffHours: Coalesce(varEventDetail.RegistrationCutoffHours, 48),
+                                                             MaxPerUser: Coalesce(varEventDetail.MaxPerUser, 0), MeetingLink: varEventDetail.MeetingLink,
+                                                             Coordinator: varEventDetail.Coordinator, POC: varEventDetail.POC, POCEmail: varEventDetail.POCEmail});
+                                                        Set(varDetailEvent, varSelectedEvent);
+                                                        Set(varSelectedSlot,
+                                                            If(ThisItem.Mine > 0, Blank(),
+                                                                {ID: ThisItem.ID, Title: ThisItem.Title, SessionDate: ThisItem.SessionDate,
+                                                                 Capacity: ThisItem.Capacity, EventID: ThisItem.EventID, EventName: ThisItem.EventName,
+                                                                 SortOrder: ThisItem.SortOrder, DurationMinutes: ThisItem.DurationMinutes,
+                                                                 Registered: ThisItem.Registered, Mine: ThisItem.Mine, SlotStart: ThisItem.SlotStart}));
+                                                        Set(varCalDate, ThisItem.SessionDate);
+                                                        Set(varDeepLink, true);
+                                                        Navigate(scrRegister, ScreenTransition.Fade)
+                  # RIGHT column: event information card
+                  - conRightCol_EvD:
+                      Control: GroupContainer
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutMinWidth: =300
+                        AlignInContainer: =AlignInContainer.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutGap: =4
+                        PaddingTop: =18
+                        PaddingBottom: =18
+                        PaddingLeft: =22
+                        PaddingRight: =22
+                        Fill: =RGBA(255, 255, 255, 1)
+                        BorderColor: =RGBA(228, 231, 239, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        RadiusTopLeft: =13
+                        RadiusTopRight: =13
+                        RadiusBottomLeft: =13
+                        RadiusBottomRight: =13
+                      Children:
+                        - lblInfoHead_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="Event Information"
+                              Height: =32
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Bold
+                              Color: =RGBA(23, 32, 51, 1)
+                        - lblDescCap_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="ABOUT THIS EVENT"
+                              Height: =20
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =11
+                              Color: =RGBA(104, 115, 138, 1)
+                        - htmlEvDesc_EvD:
+                            Control: HtmlViewer@2.1.0
+                            Properties:
+                              HtmlText: |-
+                                =If(IsBlank(varEventDetail) || IsBlank(varEventDetail.Description),
+                                    "No description provided.", varEventDetail.Description)
+                              Height: =100
+                              FillPortions: =0
+                              Size: =12
+                              Font: =Font.'Segoe UI'
+                              Color: =RGBA(55, 63, 75, 1)
+                              BorderStyle: =BorderStyle.None
+                              PaddingLeft: =0
+                              PaddingRight: =0
+                              PaddingTop: =0
+                              PaddingBottom: =0
+                        - lblCoordCap_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="COORDINATOR"
+                              Height: =20
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =11
+                              Color: =RGBA(104, 115, 138, 1)
+                        - lblCoordVal_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: |-
+                                =If(IsBlank(varEventDetail) || IsBlank(varEventDetail.Coordinator), "—",
+                                    varEventDetail.Coordinator &
+                                    If(IsBlank(varEventDetail.CoordinatorEmail), "", Char(10) & varEventDetail.CoordinatorEmail))
+                              Height: =44
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Semibold
+                              Wrap: =true
+                              VerticalAlign: =VerticalAlign.Top
+                              Color: =RGBA(23, 32, 51, 1)
+                        - lblPOCCap_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="POINT OF CONTACT"
+                              Height: =20
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =11
+                              Color: =RGBA(104, 115, 138, 1)
+                              Visible: =!IsBlank(varEventDetail.POC)
+                        - lblPOCVal_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: |-
+                                =If(IsBlank(varEventDetail) || IsBlank(varEventDetail.POC), "—",
+                                    varEventDetail.POC &
+                                    If(IsBlank(varEventDetail.POCEmail), "", Char(10) & varEventDetail.POCEmail))
+                              Height: =44
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Semibold
+                              Wrap: =true
+                              VerticalAlign: =VerticalAlign.Top
+                              Color: =RGBA(23, 32, 51, 1)
+                              Visible: =!IsBlank(varEventDetail.POC)
+                        - lblCutoffCap_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="REGISTRATION CLOSES"
+                              Height: =20
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =11
+                              Color: =RGBA(104, 115, 138, 1)
+                        - lblCutoffVal_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =Coalesce(varEventDetail.RegistrationCutoffHours, 48) & " hours before each session"
+                              Height: =24
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Semibold
+                              Color: =RGBA(23, 32, 51, 1)
+                        - lblMaxCap_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="MAX SESSIONS PER PERSON"
+                              Height: =20
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =11
+                              Color: =RGBA(104, 115, 138, 1)
+                        - lblMaxVal_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: |-
+                                =If(Coalesce(varEventDetail.MaxPerUser, 0) = 0, "Unlimited",
+                                    Text(varEventDetail.MaxPerUser))
+                              Height: =24
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Semibold
+                              Color: =RGBA(23, 32, 51, 1)
+                        - lblLinkCap_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="MEETING LINK"
+                              Height: =20
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =11
+                              Color: =RGBA(104, 115, 138, 1)
+                              Visible: =!IsBlank(varEventDetail.MeetingLink)
+                        - btnJoinLink_EvD:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="Open Meeting Link ↗"
+                              Height: =36
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Semibold
+                              Appearance: =ButtonAppearance.Secondary
+                              BasePaletteColor: =RGBA(55, 63, 75, 1)
+                              Visible: =!IsBlank(varEventDetail.MeetingLink)
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              OnSelect: =Launch(varEventDetail.MeetingLink)
+                        - recSessInfoDiv_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =""
+                              Height: =1
+                              FillPortions: =0
+                              Fill: =RGBA(228, 231, 239, 1)
+                        - lblSessInfoHead_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="Session Information"
+                              Height: =28
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Bold
+                              Color: =RGBA(23, 32, 51, 1)
+                        - conSessInfoRow1_EvD:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              Height: =34
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutGap: =8
+                              Fill: =RGBA(0, 0, 0, 0)
+                              DropShadow: =DropShadow.None
+                            Children:
+                              - lblSessInfoKey1_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Session"
+                                    FillPortions: =1
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblSessInfoVal1_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =If(IsBlank(varEvDetSelSlot), "Select a session", varEvDetSelSlot.Title)
+                                    FillPortions: =1
+                                    Size: =12
+                                    FontWeight: =FontWeight.Bold
+                                    Align: =Align.Right
+                                    Color: |-
+                                      =If(IsBlank(varEvDetSelSlot),
+                                          RGBA(104, 115, 138, 1), RGBA(23, 32, 51, 1))
+                        - recSessInfoDiv1_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =""
+                              Height: =1
+                              FillPortions: =0
+                              Fill: =RGBA(238, 238, 238, 1)
+                        - conSessInfoRow2_EvD:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              Height: =34
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutGap: =8
+                              Fill: =RGBA(0, 0, 0, 0)
+                              DropShadow: =DropShadow.None
+                            Children:
+                              - lblSessInfoKey2_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Date"
+                                    FillPortions: =1
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblSessInfoVal2_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =If(IsBlank(varEvDetSelSlot), "—",
+                                          Text(varEvDetSelSlot.SessionDate, "ddd, mmm d, yyyy"))
+                                    FillPortions: =1
+                                    Size: =12
+                                    FontWeight: =FontWeight.Bold
+                                    Align: =Align.Right
+                                    Color: =RGBA(23, 32, 51, 1)
+                        - recSessInfoDiv2_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =""
+                              Height: =1
+                              FillPortions: =0
+                              Fill: =RGBA(238, 238, 238, 1)
+                        - conSessInfoRow3_EvD:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              Height: =34
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutGap: =8
+                              Fill: =RGBA(0, 0, 0, 0)
+                              DropShadow: =DropShadow.None
+                            Children:
+                              - lblSessInfoKey3_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Capacity"
+                                    FillPortions: =1
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblSessInfoVal3_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =If(IsBlank(varEvDetSelSlot), "—",
+                                          varEvDetSelSlot.Capacity & " participants")
+                                    FillPortions: =1
+                                    Size: =12
+                                    FontWeight: =FontWeight.Bold
+                                    Align: =Align.Right
+                                    Color: =RGBA(23, 32, 51, 1)
+                        - recSessInfoDiv3_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =""
+                              Height: =1
+                              FillPortions: =0
+                              Fill: =RGBA(238, 238, 238, 1)
+                        - conSessInfoRow4_EvD:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              Height: =34
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutGap: =8
+                              Fill: =RGBA(0, 0, 0, 0)
+                              DropShadow: =DropShadow.None
+                            Children:
+                              - lblSessInfoKey4_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Availability"
+                                    FillPortions: =1
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblSessInfoVal4_EvD:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =If(IsBlank(varEvDetSelSlot), "—",
+                                          varEvDetSelSlot.Mine > 0, "Registered ✓",
+                                          varEvDetSelSlot.SlotStart < DateAdd(Now(), varEvDetSelSlot.CutoffH, TimeUnit.Hours), "Closed",
+                                          With({left: varEvDetSelSlot.Capacity - varEvDetSelSlot.Registered},
+                                              If(left = 0, "Full", left & " spots left")))
+                                    FillPortions: =1
+                                    Size: =12
+                                    FontWeight: =FontWeight.Bold
+                                    Align: =Align.Right
+                                    Color: |-
+                                      =If(IsBlank(varEvDetSelSlot), RGBA(23, 32, 51, 1),
+                                          varEvDetSelSlot.Mine > 0, RGBA(55, 63, 75, 1),
+                                          varEvDetSelSlot.SlotStart < DateAdd(Now(), varEvDetSelSlot.CutoffH, TimeUnit.Hours), RGBA(104, 115, 138, 1),
+                                          With({left: varEvDetSelSlot.Capacity - varEvDetSelSlot.Registered},
+                                              If(left = 0, RGBA(216, 75, 82, 1),
+                                                 left <= 4, RGBA(199, 122, 0, 1),
+                                                 RGBA(21, 150, 106, 1))))
+                        - recInfoSpacer_EvD:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =""
+                              FillPortions: =1
+                              Fill: =RGBA(0, 0, 0, 0)
+                        - btnRegisterEvent_EvD:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="Register for this Event →"
+                              Height: =44
+                              FillPortions: =0
+                              Size: =14
+                              FontWeight: =FontWeight.Semibold
+                              Appearance: =ButtonAppearance.Primary
+                              BasePaletteColor: =RGBA(55, 63, 75, 1)
+                              DisplayMode: =If(IsBlank(varEventDetail) || varEventDetail.EndDate < Today(), DisplayMode.Disabled, DisplayMode.Edit)
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              OnSelect: |-
+                                =Set(varSelectedEvent,
+                                    {ID: varEventDetail.ID, Title: varEventDetail.Title, Description: varEventDetail.Description,
+                                     StartDate: varEventDetail.StartDate, EndDate: varEventDetail.EndDate, Location: varEventDetail.Location,
+                                     EventType: varEventDetail.EventType, CutoffHours: Coalesce(varEventDetail.RegistrationCutoffHours, 48),
+                                     MaxPerUser: Coalesce(varEventDetail.MaxPerUser, 0), MeetingLink: varEventDetail.MeetingLink,
+                                     Coordinator: varEventDetail.Coordinator, POC: varEventDetail.POC, POCEmail: varEventDetail.POCEmail});
+                                Set(varDetailEvent, varSelectedEvent);
+                                Set(varSelectedSlot, Blank());
+                                Set(varCalDate, Blank());
+                                Set(varSwitchRegID, 0);
+                                Set(varDeepLink, true);
+                                Navigate(scrRegister, ScreenTransition.Fade)
+      # ---------------- SHARE EVENT MODAL (screen level, on top) ----------------
+      - recShareEvOverlay:
+          Control: ModernText@1.0.0
+          Properties:
+            Text: =""
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            Fill: =RGBA(20, 24, 42, 0.45)
+            Visible: =varShowShareEv
+            OnSelect: =Set(varShowShareEv, false)
+      - conShareEvModal:
+          Control: GroupContainer
+          Variant: ManualLayout
+          Properties:
+            X: =(Parent.Width - 560) / 2
+            Y: =Max(12, (Parent.Height - 600) / 2)
+            Width: =560
+            Height: =600
+            Fill: =RGBA(255, 255, 255, 1)
+            DropShadow: =DropShadow.None
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            Visible: =varShowShareEv
+          Children:
+            - lblShareEvTitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Share Event"
+                  X: =24
+                  Y: =20
+                  Width: =Parent.Width - 48
+                  Height: =30
+                  AutoHeight: =true
+                  Size: =14
+                  FontWeight: =FontWeight.Bold
+                  Color: =RGBA(23, 32, 51, 1)
+            - lblShareEvName:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: |-
+                    =If(IsBlank(varEventDetail), "",
+                        varEventDetail.Title & "  •  " &
+                        Text(varEventDetail.StartDate, "mmm d") & " – " & Text(varEventDetail.EndDate, "mmm d, yyyy"))
+                  X: =24
+                  Y: =52
+                  Width: =Parent.Width - 48
+                  Height: =22
+                  AutoHeight: =true
+                  Size: =13
+                  Color: =RGBA(104, 115, 138, 1)
+            - lblShareEvTo:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Recipients"
+                  X: =24
+                  Y: =94
+                  Width: =Parent.Width - 48
+                  Height: =18
+                  AutoHeight: =true
+                  Size: =12
+                  FontWeight: =FontWeight.Semibold
+                  Color: =RGBA(23, 32, 51, 1)
+            - txtShareEvSearch:
+                Control: ModernTextInput@1.0.0
+                Properties:
+                  X: =24
+                  Y: =116
+                  Width: =Parent.Width - 48
+                  Height: =36
+                  Size: =13
+                  Default: =""
+                  Placeholder: ="Type a name or email to search…"
+                  Type: =TextInputType.SingleLine
+            - galShareEvSel:
+                Control: Gallery
+                Variant: Horizontal
+                Properties:
+                  X: =24
+                  Y: =158
+                  Width: =Parent.Width - 48
+                  Height: =34
+                  TemplateSize: =190
+                  TemplatePadding: =0
+                  ShowScrollbar: =false
+                  Visible: =CountRows(colShareEvTo) > 0
+                  Items: =colShareEvTo
+                Children:
+                  - btnShareEvChip:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Text: =ThisItem.DisplayName & "  ✕"
+                        X: =0
+                        Y: =0
+                        Width: =Parent.TemplateWidth - 8
+                        Height: =32
+                        Size: =12
+                        Appearance: =ButtonAppearance.Secondary
+                        BasePaletteColor: =RGBA(55, 63, 75, 1)
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
+                        OnSelect: =Remove(colShareEvTo, ThisItem)
+            - lblShareEvToHint:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Results appear as you type - click a person to add them; click a chip to remove."
+                  X: =24
+                  Y: =196
+                  Width: =Parent.Width - 48
+                  Height: =16
+                  AutoHeight: =true
+                  Size: =11
+                  Color: =RGBA(104, 115, 138, 1)
+            - lblShareEvSubject:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Subject"
+                  X: =24
+                  Y: =224
+                  Width: =Parent.Width - 48
+                  Height: =18
+                  AutoHeight: =true
+                  Size: =12
+                  FontWeight: =FontWeight.Semibold
+                  Color: =RGBA(23, 32, 51, 1)
+            - txtShareEvSubject:
+                Control: ModernTextInput@1.0.0
+                Properties:
+                  X: =24
+                  Y: =246
+                  Width: =Parent.Width - 48
+                  Height: =36
+                  Size: =13
+                  Default: |-
+                    ="Invitation: " & If(IsBlank(varEventDetail), "", varEventDetail.Title)
+                  Type: =TextInputType.SingleLine
+            - lblShareEvBody:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Message"
+                  X: =24
+                  Y: =298
+                  Width: =Parent.Width - 48
+                  Height: =18
+                  AutoHeight: =true
+                  Size: =12
+                  FontWeight: =FontWeight.Semibold
+                  Color: =RGBA(23, 32, 51, 1)
+            - txtShareEvBody:
+                Control: ModernTextInput@1.0.0
+                Properties:
+                  X: =24
+                  Y: =320
+                  Width: =Parent.Width - 48
+                  Height: =130
+                  Size: =13
+                  Default: |-
+                    ="Hi," & Char(10) & Char(10) &
+                     "I'd like to share this event with you: " & If(IsBlank(varEventDetail), "", varEventDetail.Title) & "." & Char(10) &
+                     "Use the link below to see the details and register." & Char(10) & Char(10) &
+                     "Shared by " & varUserName
+                  Type: =TextInputType.Multiline
+            - lblShareEvLink:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: |-
+                    =If(IsBlank(varAppURL),
+                        "⚠ No app link configured - set varAppURL in App.OnStart to the app's web link first.",
+                        "Link: " & varAppURL & If(IsBlank(Find("?", varAppURL)), "?", "&") & "eventid=" & varDetailEventID)
+                  X: =24
+                  Y: =460
+                  Width: =Parent.Width - 48
+                  Height: =48
+                  AutoHeight: =true
+                  Size: =11
+                  Wrap: =true
+                  Color: |-
+                    =If(IsBlank(varAppURL), RGBA(199, 122, 0, 1), RGBA(104, 115, 138, 1))
+            - btnShareEvCopy:
+                Control: ModernButton@1.0.0
+                Properties:
+                  Text: ="⧉ Copy Link"
+                  X: =24
+                  Y: =Parent.Height - 64
+                  Width: =130
+                  Height: =40
+                  Size: =13
+                  FontWeight: =FontWeight.Semibold
+                  Appearance: =ButtonAppearance.Secondary
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  OnSelect: |-
+                    =If(IsBlank(varAppURL),
+                        Notify("No app link configured - set varAppURL in App.OnStart first.", NotificationType.Warning),
+                        IfError(
+                            Copy(varAppURL & If(IsBlank(Find("?", varAppURL)), "?", "&") & "eventid=" & varDetailEventID),
+                            Notify("Could not access the clipboard in this browser.", NotificationType.Error),
+                            Notify("Link copied.", NotificationType.Success)))
+            - btnShareEvCancel:
+                Control: ModernButton@1.0.0
+                Properties:
+                  Text: ="Cancel"
+                  X: =Parent.Width - 336
+                  Y: =Parent.Height - 64
+                  Width: =140
+                  Height: =40
+                  Size: =13
+                  FontWeight: =FontWeight.Semibold
+                  Appearance: =ButtonAppearance.Secondary
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  OnSelect: =Set(varShowShareEv, false)
+            - btnShareEvSend:
+                Control: ModernButton@1.0.0
+                Properties:
+                  Text: ="Send"
+                  X: =Parent.Width - 184
+                  Y: =Parent.Height - 64
+                  Width: =160
+                  Height: =40
+                  Size: =13
+                  FontWeight: =FontWeight.Semibold
+                  Appearance: =ButtonAppearance.Primary
+                  BasePaletteColor: =RGBA(55, 63, 75, 1)
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  OnSelect: |-
+                    =If(CountRows(colShareEvTo) = 0,
+                        Notify("Pick at least one recipient.", NotificationType.Warning),
+                        IsBlank(varAppURL),
+                        Notify("No app link configured - set varAppURL in App.OnStart to the app's web link first.", NotificationType.Warning),
+                        With({link: varAppURL & If(IsBlank(Find("?", varAppURL)), "?", "&") & "eventid=" & varDetailEventID},
+                            If(IsError(EventSessionRegistration_ShareEvent.Run(
+                                    Concat(colShareEvTo, Mail, ";"),
+                                    Trim(txtShareEvSubject.Text),
+                                    txtShareEvBody.Text,
+                                    varEventDetail.Title,
+                                    link)),
+                                Notify("Could not send. Check that the EventSessionRegistration_ShareEvent flow is connected and turned on.", NotificationType.Error),
+                                Set(varShowShareEv, false);
+                                Notify("Event shared with " & Concat(colShareEvTo, DisplayName, ", "), NotificationType.Success))))
+            # Suggestion dropdown - declared last so it renders on top of the fields below it
+            - galShareEvSug:
+                Control: Gallery
+                Variant: Vertical
+                Properties:
+                  X: =24
+                  Y: =152
+                  Width: =Parent.Width - 48
+                  Height: =176
+                  TemplateSize: =44
+                  TemplatePadding: =0
+                  ShowScrollbar: =true
+                  Visible: =!IsBlank(Trim(txtShareEvSearch.Text))
+                  Items: |-
+                    =Office365Users.SearchUser({searchTerm: Trim(txtShareEvSearch.Text), top: 8})
+                  OnSelect: |-
+                    =If(IsBlank(LookUp(colShareEvTo, Lower(Mail) = Lower(ThisItem.Mail))),
+                        Collect(colShareEvTo, {DisplayName: ThisItem.DisplayName, Mail: ThisItem.Mail}));
+                    Reset(txtShareEvSearch)
+                Children:
+                  - recShareEvSugBg:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: =""
+                        X: =0
+                        Y: =0
+                        Width: =Parent.TemplateWidth
+                        Height: =Parent.TemplateHeight
+                        Fill: =RGBA(255, 255, 255, 1)
+                        BorderColor: =RGBA(228, 231, 239, 1)
+                        BorderThickness: =1
+                        OnSelect: =Select(Parent)
+                  - lblShareEvSugName:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: =ThisItem.DisplayName
+                        X: =12
+                        Y: =4
+                        Width: =Parent.TemplateWidth - 24
+                        Height: =18
+                        AutoHeight: =true
+                        Size: =13
+                        FontWeight: =FontWeight.Semibold
+                        Color: =RGBA(23, 32, 51, 1)
+                        OnSelect: =Select(Parent)
+                  - lblShareEvSugMail:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: =Lower(Coalesce(ThisItem.Mail, ""))
+                        X: =12
+                        Y: =22
+                        Width: =Parent.TemplateWidth - 24
+                        Height: =16
+                        AutoHeight: =true
+                        Size: =11
+                        Color: =RGBA(104, 115, 138, 1)
+                        OnSelect: =Select(Parent)
+      # ---------------- CANCEL REGISTRATION MODAL (screen level, on top) ----------------
+      - recCancelEvOverlay:
+          Control: ModernText@1.0.0
+          Properties:
+            Text: =""
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            Fill: =RGBA(20, 24, 42, 0.45)
+            Visible: =varShowCancelEvD
+            OnSelect: =Set(varShowCancelEvD, false)
+      - conCancelEvModal:
+          Control: GroupContainer
+          Variant: ManualLayout
+          Properties:
+            X: =(Parent.Width - 480) / 2
+            Y: =(Parent.Height - 260) / 2
+            Width: =480
+            Height: =260
+            Fill: =RGBA(255, 255, 255, 1)
+            DropShadow: =DropShadow.None
+            RadiusTopLeft: =14
+            RadiusTopRight: =14
+            RadiusBottomLeft: =14
+            RadiusBottomRight: =14
+            Visible: =varShowCancelEvD
+          Children:
+            - lblCancelEvTitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Cancel Registration?"
+                  X: =24
+                  Y: =24
+                  Width: =Parent.Width - 48
+                  Height: =32
+                  AutoHeight: =true
+                  Size: =14
+                  FontWeight: =FontWeight.Bold
+                  Color: =RGBA(23, 32, 51, 1)
+            - lblCancelEvBody:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: |-
+                    ="Are you sure you want to cancel your " &
+                    If(IsBlank(varCancelTarget), "session", varCancelTarget.TimeSlot & " session on " & Text(varCancelTarget.SessionDate, "ddd, mmm d")) &
+                    "? The seat will become available to another participant."
+                  X: =24
+                  Y: =60
+                  Width: =Parent.Width - 48
+                  Height: =100
+                  AutoHeight: =true
+                  Size: =13
+                  Color: =RGBA(104, 115, 138, 1)
+                  Wrap: =true
+                  VerticalAlign: =VerticalAlign.Top
+            - btnCancelEvKeep:
+                Control: ModernButton@1.0.0
+                Properties:
+                  Text: ="Keep Registration"
+                  X: =Parent.Width - 368
+                  Y: =Parent.Height - 76
+                  Width: =160
+                  Height: =40
+                  Size: =13
+                  FontWeight: =FontWeight.Semibold
+                  Appearance: =ButtonAppearance.Secondary
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  OnSelect: =Set(varShowCancelEvD, false)
+            - btnCancelEvConfirm:
+                Control: ModernButton@1.0.0
+                Properties:
+                  Text: ="Cancel Registration"
+                  X: =Parent.Width - 198
+                  Y: =Parent.Height - 76
+                  Width: =174
+                  Height: =40
+                  Size: =13
+                  FontWeight: =FontWeight.Semibold
+                  Appearance: =ButtonAppearance.Outline
+                  Color: =RGBA(216, 75, 82, 1)
+                  BorderColor: =RGBA(239, 183, 187, 1)
+                  RadiusTopLeft: =8
+                  RadiusTopRight: =8
+                  RadiusBottomLeft: =8
+                  RadiusBottomRight: =8
+                  OnSelect: |-
+                    =Patch(EventSessionRegistration_Registrations,
+                        LookUp(EventSessionRegistration_Registrations, ID = varCancelTarget.ID),
+                        {Status: "Cancelled"});
+                    With({tpl: LookUp(EventSessionRegistration_EmailTemplates, TemplateKey = "RegistrationCancelled"),
+                          link: Coalesce(varEventDetail.MeetingLink, "")},
+                        If(IsBlank(tpl),
+                            Notify("Cancelled, but no email was sent - the 'RegistrationCancelled' template is missing from the EmailTemplates list.", NotificationType.Warning),
+                            tpl.IsActive,
+                            If(IsError(
+                                EventSessionRegistration_SendAppEmail.Run(
+                                    varCancelTarget.UserEmail,
+                                    Substitute(Substitute(Substitute(Substitute(Substitute(Substitute(tpl.Subject,
+                                        "{UserName}", varCancelTarget.UserName),
+                                        "{EventName}", Coalesce(varCancelTarget.EventName, "")),
+                                        "{SessionDate}", Text(varCancelTarget.SessionDate, "dddd, mmmm d, yyyy")),
+                                        "{TimeSlot}", varCancelTarget.TimeSlot),
+                                        "{MeetingLink}", link),
+                                        "{ReferenceID}", "WSR-" & Text(varCancelTarget.ID)),
+                                    Substitute(Substitute(Substitute(Substitute(Substitute(Substitute(tpl.Body,
+                                        "{UserName}", varCancelTarget.UserName),
+                                        "{EventName}", Coalesce(varCancelTarget.EventName, "")),
+                                        "{SessionDate}", Text(varCancelTarget.SessionDate, "dddd, mmmm d, yyyy")),
+                                        "{TimeSlot}", varCancelTarget.TimeSlot),
+                                        "{MeetingLink}", link),
+                                        "{ReferenceID}", "WSR-" & Text(varCancelTarget.ID)))),
+                                Notify("Cancelled, but the notification email could not be sent.", NotificationType.Warning))));
+                    Set(varShowCancelEvD, false);
+                    ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+                    ClearCollect(colMyEvRegs_EvD, SortByColumns(Filter(EventSessionRegistration_Registrations, EventID = varDetailEventID, UserEmail = Lower(User().Email), Status = "Confirmed"), "SessionDate", SortOrder.Ascending));
+                    Notify("Registration cancelled. The seat is now available.", NotificationType.Success)

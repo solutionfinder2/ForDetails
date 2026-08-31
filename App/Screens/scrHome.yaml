@@ -1,0 +1,1523 @@
+# =============================================================
+# scrHome - Dashboard / Landing screen (RESPONSIVE, MODERN CONTROLS)
+# Root horizontal container: fixed sidebar (245) + flexible main area.
+# UI/UX ONLY - inline sample data. Turn OFF "Scale to fit" in app settings.
+# =============================================================
+Screens:
+  scrHome:
+    Properties:
+      Fill: =RGBA(246, 247, 251, 1)
+      LoadingSpinnerColor: =RGBA(55, 63, 75, 1)
+      OnVisible: |-
+        =ClearCollect(colWeekSlots, Filter(EventSessionRegistration_SessionTimeSlots, IsActive = true, SessionDate >= Today(), SessionDate < DateAdd(Today(), 7, TimeUnit.Days)));
+        ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+        ClearCollect(colUpcomingEvents, Filter(EventSessionRegistration_Events, IsActive = true, EndDate >= Today()));
+        ClearCollect(colRestrictedEv_Home, Filter(colUpcomingEvents, !IsBlank(AudienceGroupID)));
+        ForAll(colRestrictedEv_Home,
+            With({gid: AudienceGroupID, evid: ID},
+                With({member: IfError(
+                        LookUp(Office365Groups.ListGroupMembers(gid).value,
+                            Lower(Coalesce(mail, userPrincipalName)) = Lower(User().Email)),
+                        Blank())},
+                    If(IsBlank(member),
+                        Remove(colUpcomingEvents, LookUp(colUpcomingEvents, ID = evid))))))
+    Children:
+      - imgBackground_Home:
+          Control: Image
+          Properties:
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            ImagePosition: =ImagePosition.Fill
+      - conRoot_Home:
+          Control: GroupContainer
+          Variant: AutoLayout
+          Properties:
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutGap: =0
+            Fill: =RGBA(0, 0, 0, 0)
+            DropShadow: =DropShadow.None
+          Children:
+            # ---------------- SIDEBAR ----------------
+            - conSidebar_Home:
+                Control: GroupContainer
+                Variant: AutoLayout
+                Properties:
+                  Width: =245
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutGap: =6
+                  PaddingTop: =16
+                  PaddingBottom: =16
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  Fill: =RGBA(33, 37, 45, 1)
+                  Visible: =varSidebarOpen
+                  DropShadow: =DropShadow.None
+                Children:
+                  - conBrand_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =92
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - imgLogo_Home:
+                            Control: Image
+                            Properties:
+                              X: =4
+                              Y: =8
+                              Width: =48
+                              Height: =48
+                              ImagePosition: =ImagePosition.Fit
+                              Fill: =RGBA(255, 255, 255, 0.08)
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              OnSelect: =Navigate(scrIntro, ScreenTransition.Fade)
+                        - lblBrand_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="ACME"
+                              X: =60
+                              Y: =8
+                              Width: =Parent.Width - 60
+                              Height: =48
+                              Size: =22
+                              FontWeight: =FontWeight.Bold
+                              Color: =RGBA(255, 255, 255, 1)
+                              OnSelect: =Navigate(scrIntro, ScreenTransition.Fade)
+                        - lblBrandSub_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="Weekly Session Registration"
+                              X: =4
+                              Y: =62
+                              Width: =Parent.Width - 8
+                              Height: =24
+                              AutoHeight: =true
+                              Size: =12
+                              FontWeight: =FontWeight.Semibold
+                              Color: =RGBA(158, 165, 177, 1)
+                              Wrap: =true
+                              OnSelect: =Navigate(scrIntro, ScreenTransition.Fade)
+                  - conNavActive_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =44
+                        FillPortions: =0
+                        Fill: =RGBA(255, 255, 255, 0.16)
+                        DropShadow: =DropShadow.None
+                        RadiusTopLeft: =10
+                        RadiusTopRight: =10
+                        RadiusBottomLeft: =10
+                        RadiusBottomRight: =10
+                      Children:
+                        - imgNavHome_Home:
+                            Control: Image
+                            Properties:
+                              X: =14
+                              Y: =12
+                              Width: =20
+                              Height: =20
+                              ImagePosition: =ImagePosition.Fit
+                              OnSelect: =Navigate(scrHome, ScreenTransition.Fade)
+                              Image: |-
+                                ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#FFFFFF' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M3 11.5 12 4l9 7.5'/><path d='M5.5 10.2V20h13v-9.8'/></svg>")
+                        - btnNavHome_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="Home"
+                              X: =44
+                              Y: =0
+                              Width: =Parent.Width - 44
+                              Height: =44
+                              Size: =14
+                              Align: =Align.Left
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(255, 255, 255, 1)
+                              OnSelect: =Navigate(scrHome, ScreenTransition.Fade)
+                  - conNavRegister_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =44
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - imgNavRegister_Home:
+                            Control: Image
+                            Properties:
+                              X: =14
+                              Y: =12
+                              Width: =20
+                              Height: =20
+                              ImagePosition: =ImagePosition.Fit
+                              OnSelect: =Navigate(scrRegister, ScreenTransition.Fade)
+                              Image: |-
+                                ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#CBD0D9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='3.5' y='5' width='17' height='15.5' rx='2'/><path d='M3.5 9.5h17M8 3v4M16 3v4M12 12.5v5M9.5 15h5'/></svg>")
+                        - btnNavRegister_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="Register"
+                              X: =44
+                              Y: =0
+                              Width: =Parent.Width - 44
+                              Height: =44
+                              Size: =14
+                              Align: =Align.Left
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(203, 208, 217, 1)
+                              OnSelect: =Navigate(scrRegister, ScreenTransition.Fade)
+                  - conNavMyReg_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =44
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - imgNavMyReg_Home:
+                            Control: Image
+                            Properties:
+                              X: =14
+                              Y: =12
+                              Width: =20
+                              Height: =20
+                              ImagePosition: =ImagePosition.Fit
+                              OnSelect: =Navigate(scrMyRegistrations, ScreenTransition.Fade)
+                              Image: |-
+                                ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#CBD0D9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='4' width='14' height='17' rx='2'/><path d='M9 2.8h6v2.7H9z'/><path d='M9 13l2 2 4-4.5'/></svg>")
+                        - btnNavMyReg_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="My Registrations"
+                              X: =44
+                              Y: =0
+                              Width: =Parent.Width - 44
+                              Height: =44
+                              Size: =14
+                              Align: =Align.Left
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(203, 208, 217, 1)
+                              OnSelect: =Navigate(scrMyRegistrations, ScreenTransition.Fade)
+                  - conNavProfile_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =44
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - imgNavProfile_Home:
+                            Control: Image
+                            Properties:
+                              X: =14
+                              Y: =12
+                              Width: =20
+                              Height: =20
+                              ImagePosition: =ImagePosition.Fit
+                              OnSelect: =Navigate(scrProfile, ScreenTransition.Fade)
+                              Image: |-
+                                ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#CBD0D9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8.2' r='3.4'/><path d='M4.8 20c1.4-3.6 4-5.4 7.2-5.4s5.8 1.8 7.2 5.4'/></svg>")
+                        - btnNavProfile_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="My Profile"
+                              X: =44
+                              Y: =0
+                              Width: =Parent.Width - 44
+                              Height: =44
+                              Size: =14
+                              Align: =Align.Left
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(203, 208, 217, 1)
+                              OnSelect: =Navigate(scrProfile, ScreenTransition.Fade)
+                  - conNavHelp_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =44
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - imgNavHelp_Home:
+                            Control: Image
+                            Properties:
+                              X: =14
+                              Y: =12
+                              Width: =20
+                              Height: =20
+                              ImagePosition: =ImagePosition.Fit
+                              OnSelect: =Navigate(scrHelp, ScreenTransition.Fade)
+                              Image: |-
+                                ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#CBD0D9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M9.6 9.3c.3-1.5 1.5-2.3 2.9-2.2 1.5.1 2.6 1.1 2.6 2.5 0 1.9-2.6 2.2-2.6 4'/><circle cx='12.4' cy='17' r='0.7' fill='#CBD0D9' stroke='none'/></svg>")
+                        - btnNavHelp_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="Help / FAQ"
+                              X: =44
+                              Y: =0
+                              Width: =Parent.Width - 44
+                              Height: =44
+                              Size: =14
+                              Align: =Align.Left
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(203, 208, 217, 1)
+                              OnSelect: =Navigate(scrHelp, ScreenTransition.Fade)
+                  - recNavDivider_Home:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: =""
+                        Height: =1
+                        FillPortions: =0
+                        Fill: =RGBA(255, 255, 255, 0.2)
+                  - conNavAdmin_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =44
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - imgNavAdmin_Home:
+                            Control: Image
+                            Properties:
+                              Visible: =varIsCoordinator
+                              X: =14
+                              Y: =12
+                              Width: =20
+                              Height: =20
+                              ImagePosition: =ImagePosition.Fit
+                              OnSelect: =Navigate(scrAdmin, ScreenTransition.Fade)
+                              Image: |-
+                                ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#CBD0D9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='3.2'/><path d='M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1'/></svg>")
+                        - btnNavAdmin_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Visible: =varIsCoordinator
+                              Text: ="Admin"
+                              X: =44
+                              Y: =0
+                              Width: =Parent.Width - 44
+                              Height: =44
+                              Size: =14
+                              Align: =Align.Left
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(203, 208, 217, 1)
+                              OnSelect: =Navigate(scrAdmin, ScreenTransition.Fade)
+                  - conNavSettings_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =44
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - imgNavSettings_Home:
+                            Control: Image
+                            Properties:
+                              Visible: =varIsAdmin
+                              X: =14
+                              Y: =12
+                              Width: =20
+                              Height: =20
+                              ImagePosition: =ImagePosition.Fit
+                              OnSelect: =Navigate(scrSettings, ScreenTransition.Fade)
+                              Image: |-
+                                ="data:image/svg+xml;utf8," & EncodeUrl("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#CBD0D9' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7.2h7M15 7.2h5M4 12h3M11 12h9M4 16.8h9M17 16.8h3'/><circle cx='13' cy='7.2' r='1.8'/><circle cx='9' cy='12' r='1.8'/><circle cx='15' cy='16.8' r='1.8'/></svg>")
+                        - btnNavSettings_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Visible: =varIsAdmin
+                              Text: ="App Settings"
+                              X: =44
+                              Y: =0
+                              Width: =Parent.Width - 44
+                              Height: =44
+                              Size: =14
+                              Align: =Align.Left
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(203, 208, 217, 1)
+                              OnSelect: =Navigate(scrSettings, ScreenTransition.Fade)
+                  - lblNavSpacer_Home:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: =""
+                        FillPortions: =1
+                  - conUser_Home:
+                      Control: GroupContainer
+                      Variant: ManualLayout
+                      Properties:
+                        Height: =70
+                        FillPortions: =0
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - recUserDivider_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =""
+                              X: =0
+                              Y: =0
+                              Width: =Parent.Width
+                              Height: =1
+                              Fill: =RGBA(255, 255, 255, 0.2)
+                        - lblAvatar_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =Upper(Left(User().FullName, 1))
+                              X: =4
+                              Y: =16
+                              Width: =38
+                              Height: =38
+                              AutoHeight: =true
+                              Size: =12
+                              FontWeight: =FontWeight.Bold
+                              Color: =RGBA(255, 255, 255, 1)
+                              Fill: =RGBA(105, 114, 128, 1)
+                              Align: =Align.Center
+                              RadiusTopLeft: =19
+                              RadiusTopRight: =19
+                              RadiusBottomLeft: =19
+                              RadiusBottomRight: =19
+                        - imgUserPhoto_Home:
+                            Control: Image
+                            Properties:
+                              Image: =User().Image
+                              X: =4
+                              Y: =16
+                              Width: =38
+                              Height: =38
+                              ImagePosition: =ImagePosition.Fill
+                              RadiusTopLeft: =19
+                              RadiusTopRight: =19
+                              RadiusBottomLeft: =19
+                              RadiusBottomRight: =19
+                        - lblUserName_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =User().FullName
+                              X: =50
+                              Y: =18
+                              Width: =Parent.Width - 54
+                              Height: =18
+                              AutoHeight: =true
+                              Size: =13
+                              FontWeight: =FontWeight.Semibold
+                              Color: =RGBA(255, 255, 255, 1)
+                        - lblUserEmail_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =User().Email
+                              X: =50
+                              Y: =36
+                              Width: =Parent.Width - 54
+                              Height: =16
+                              AutoHeight: =true
+                              Size: =12
+                              Color: =RGBA(158, 165, 177, 1)
+            # ---------------- MAIN AREA ----------------
+            - conMain_Home:
+                Control: GroupContainer
+                Variant: AutoLayout
+                Properties:
+                  FillPortions: =1
+                  AlignInContainer: =AlignInContainer.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutGap: =16
+                  PaddingTop: =24
+                  PaddingBottom: =24
+                  PaddingLeft: =30
+                  PaddingRight: =30
+                  Fill: =RGBA(243, 244, 246, 0.88)
+                  DropShadow: =DropShadow.None
+                Children:
+                  # Header
+                  - conHeader_Home:
+                      Control: GroupContainer
+                      Variant: AutoLayout
+                      Properties:
+                        Height: =64
+                        FillPortions: =0
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutGap: =12
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - btnSidebarToggle_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="☰"
+                              Width: =46
+                              Height: =42
+                              FillPortions: =0
+                              Size: =16
+                              Appearance: =ButtonAppearance.Secondary
+                              BasePaletteColor: =RGBA(55, 63, 75, 1)
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              OnSelect: =Set(varSidebarOpen, !varSidebarOpen)
+                        - btnBack_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="← Back"
+                              Width: =96
+                              Height: =42
+                              FillPortions: =0
+                              Size: =14
+                              FontWeight: =FontWeight.Semibold
+                              Appearance: =ButtonAppearance.Secondary
+                              BasePaletteColor: =RGBA(55, 63, 75, 1)
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              OnSelect: =Back(ScreenTransition.Fade)
+                        - conHeaderText_Home:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =1
+                              AlignInContainer: =AlignInContainer.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutGap: =2
+                              Fill: =RGBA(0, 0, 0, 0)
+                              DropShadow: =DropShadow.None
+                            Children:
+                              - lblHomeTitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Welcome, " & First(Split(User().FullName, " ")).Value & "! 👋"
+                                    Height: =36
+                                    AutoHeight: =true
+                                    FillPortions: =0
+                                    Size: =20
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblHomeSubtitle:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Register for a weekly session. Each time slot has a maximum of 20 participants."
+                                    Height: =22
+                                    AutoHeight: =true
+                                    FillPortions: =0
+                                    Size: =14
+                                    Color: =RGBA(104, 115, 138, 1)
+                        - btnNotify_Home:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="🔔"
+                              Width: =60
+                              Height: =42
+                              FillPortions: =0
+                              Size: =12
+                              Appearance: =ButtonAppearance.Outline
+                              Color: =RGBA(23, 32, 51, 1)
+                              BorderColor: =RGBA(228, 231, 239, 1)
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              OnSelect: =Notify("You have 2 notifications.", NotificationType.Information)
+                  # Stat cards (flexible widths, shrink/grow with window)
+                  - conStats_Home:
+                      Control: GroupContainer
+                      Variant: AutoLayout
+                      Properties:
+                        Height: =100
+                        FillPortions: =0
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutGap: =14
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - conStatCard1_Home:
+                            Control: GroupContainer
+                            Variant: ManualLayout
+                            Properties:
+                              FillPortions: =1
+                              LayoutMinWidth: =200
+                              Fill: =RGBA(255, 255, 255, 1)
+                              BorderColor: =RGBA(228, 231, 239, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              RadiusTopLeft: =13
+                              RadiusTopRight: =13
+                              RadiusBottomLeft: =13
+                              RadiusBottomRight: =13
+                            Children:
+                              - lblStatIcon1_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="▣"
+                                    X: =18
+                                    Y: =29
+                                    Width: =42
+                                    Height: =42
+                                    AutoHeight: =true
+                                    Size: =14
+                                    Align: =Align.Center
+                                    Fill: =RGBA(232, 234, 238, 1)
+                                    Color: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =11
+                                    RadiusTopRight: =11
+                                    RadiusBottomLeft: =11
+                                    RadiusBottomRight: =11
+                              - lblStatTitle1_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="This Week's Sessions"
+                                    X: =74
+                                    Y: =16
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblStatValue1_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Text(CountRows(colWeekSlots))
+                                    X: =74
+                                    Y: =32
+                                    Width: =Parent.Width - 90
+                                    Height: =36
+                                    AutoHeight: =true
+                                    Size: =19
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblStatSub1_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Total available slots"
+                                    X: =74
+                                    Y: =66
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                        - conStatCard2_Home:
+                            Control: GroupContainer
+                            Variant: ManualLayout
+                            Properties:
+                              FillPortions: =1
+                              LayoutMinWidth: =200
+                              Fill: =RGBA(255, 255, 255, 1)
+                              BorderColor: =RGBA(228, 231, 239, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              RadiusTopLeft: =13
+                              RadiusTopRight: =13
+                              RadiusBottomLeft: =13
+                              RadiusBottomRight: =13
+                            Children:
+                              - lblStatIcon2_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="♙"
+                                    X: =18
+                                    Y: =29
+                                    Width: =42
+                                    Height: =42
+                                    AutoHeight: =true
+                                    Size: =14
+                                    Align: =Align.Center
+                                    Fill: =RGBA(232, 234, 238, 1)
+                                    Color: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =11
+                                    RadiusTopRight: =11
+                                    RadiusBottomLeft: =11
+                                    RadiusBottomRight: =11
+                              - lblStatTitle2_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="My Registrations"
+                                    X: =74
+                                    Y: =16
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblStatValue2_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Text(CountRows(Filter(colFutureRegs, UserEmail = Lower(User().Email))))
+                                    X: =74
+                                    Y: =32
+                                    Width: =Parent.Width - 90
+                                    Height: =36
+                                    AutoHeight: =true
+                                    Size: =19
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblStatSub2_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Confirmed"
+                                    X: =74
+                                    Y: =66
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                        - conStatCard3_Home:
+                            Control: GroupContainer
+                            Variant: ManualLayout
+                            Properties:
+                              FillPortions: =1
+                              LayoutMinWidth: =200
+                              Fill: =RGBA(255, 255, 255, 1)
+                              BorderColor: =RGBA(228, 231, 239, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              RadiusTopLeft: =13
+                              RadiusTopRight: =13
+                              RadiusBottomLeft: =13
+                              RadiusBottomRight: =13
+                            Children:
+                              - lblStatIcon3_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="♧"
+                                    X: =18
+                                    Y: =29
+                                    Width: =42
+                                    Height: =42
+                                    AutoHeight: =true
+                                    Size: =14
+                                    Align: =Align.Center
+                                    Fill: =RGBA(232, 234, 238, 1)
+                                    Color: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =11
+                                    RadiusTopRight: =11
+                                    RadiusBottomLeft: =11
+                                    RadiusBottomRight: =11
+                              - lblStatTitle3_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Spots Available"
+                                    X: =74
+                                    Y: =16
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblStatValue3_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Text(Max(0, Coalesce(Sum(colWeekSlots, Capacity), 0) - CountRows(Filter(colFutureRegs, SessionDate < DateAdd(Today(), 7, TimeUnit.Days)))))
+                                    X: =74
+                                    Y: =32
+                                    Width: =Parent.Width - 90
+                                    Height: =36
+                                    AutoHeight: =true
+                                    Size: =19
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblStatSub3_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Across all slots"
+                                    X: =74
+                                    Y: =66
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                        - conStatCard4_Home:
+                            Control: GroupContainer
+                            Variant: ManualLayout
+                            Properties:
+                              FillPortions: =1
+                              LayoutMinWidth: =200
+                              Fill: =RGBA(255, 255, 255, 1)
+                              BorderColor: =RGBA(228, 231, 239, 1)
+                              BorderThickness: =1
+                              DropShadow: =DropShadow.None
+                              RadiusTopLeft: =13
+                              RadiusTopRight: =13
+                              RadiusBottomLeft: =13
+                              RadiusBottomRight: =13
+                            Children:
+                              - lblStatIcon4_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="◷"
+                                    X: =18
+                                    Y: =29
+                                    Width: =42
+                                    Height: =42
+                                    AutoHeight: =true
+                                    Size: =14
+                                    Align: =Align.Center
+                                    Fill: =RGBA(232, 234, 238, 1)
+                                    Color: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =11
+                                    RadiusTopRight: =11
+                                    RadiusBottomLeft: =11
+                                    RadiusBottomRight: =11
+                              - lblStatTitle4_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="Next Session"
+                                    X: =74
+                                    Y: =16
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblStatValue4_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =With({nextReg: First(SortByColumns(Filter(colFutureRegs, UserEmail = Lower(User().Email)), "SessionDate", SortOrder.Ascending))},
+                                          If(IsBlank(nextReg), "None yet", Text(nextReg.SessionDate, "ddd, mmm d")))
+                                    X: =74
+                                    Y: =32
+                                    Width: =Parent.Width - 90
+                                    Height: =36
+                                    AutoHeight: =true
+                                    Size: =12
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblStatSub4_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =With({nextReg: First(SortByColumns(Filter(colFutureRegs, UserEmail = Lower(User().Email)), "SessionDate", SortOrder.Ascending))},
+                                          If(IsBlank(nextReg), "Register for a session", nextReg.TimeSlot))
+                                    X: =74
+                                    Y: =66
+                                    Width: =Parent.Width - 90
+                                    Height: =18
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                  # Upcoming Events strip (event-first browsing)
+                  - conEvents_Home:
+                      Control: GroupContainer
+                      Variant: AutoLayout
+                      Properties:
+                        Height: =174
+                        FillPortions: =0
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutGap: =6
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - lblEventsTitle_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="Upcoming Events"
+                              Height: =24
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Bold
+                              Color: =RGBA(23, 32, 51, 1)
+                        - lblNoEvents_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: ="No upcoming events right now. Browse the available sessions below."
+                              Height: =30
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              Color: =RGBA(104, 115, 138, 1)
+                              Visible: =IsEmpty(colUpcomingEvents)
+                        - galEvents_Home:
+                            Control: Gallery
+                            Variant: Horizontal
+                            Properties:
+                              FillPortions: =1
+                              AlignInContainer: =AlignInContainer.Stretch
+                              TemplateSize: =310
+                              TemplatePadding: =0
+                              ShowScrollbar: =false
+                              Visible: =!IsEmpty(colUpcomingEvents)
+                              Items: =SortByColumns(colUpcomingEvents, "StartDate", SortOrder.Ascending)
+                            Children:
+                              - recEventCard_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =""
+                                    X: =0
+                                    Y: =2
+                                    Width: =Parent.TemplateWidth - 12
+                                    Height: =136
+                                    Fill: =RGBA(255, 255, 255, 1)
+                                    RadiusTopLeft: =12
+                                    RadiusTopRight: =12
+                                    RadiusBottomLeft: =12
+                                    RadiusBottomRight: =12
+                              - lblEventCardName_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =ThisItem.Title
+                                    X: =16
+                                    Y: =14
+                                    Width: =Parent.TemplateWidth - 122
+                                    Height: =24
+                                    AutoHeight: =true
+                                    Size: =14
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - btnEventDetails_Home:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Text: ="Details ↗"
+                                    X: =Parent.TemplateWidth - 106
+                                    Y: =12
+                                    Width: =84
+                                    Height: =28
+                                    Size: =11
+                                    FontWeight: =FontWeight.Semibold
+                                    Appearance: =ButtonAppearance.Transparent
+                                    Color: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    OnSelect: |-
+                                      =Set(varDetailEventID, ThisItem.ID);
+                                      Navigate(scrEventDetails, ScreenTransition.Fade)
+                              - lblEventCardMeta_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =Text(ThisItem.StartDate, "mmm d") & " – " & Text(ThisItem.EndDate, "mmm d, yyyy") &
+                                      If(IsBlank(ThisItem.EventType), "", "  ·  " & ThisItem.EventType)
+                                    X: =16
+                                    Y: =40
+                                    Width: =Parent.TemplateWidth - 44
+                                    Height: =20
+                                    AutoHeight: =true
+                                    Size: =12
+                                    FontWeight: =FontWeight.Semibold
+                                    Color: =RGBA(55, 63, 75, 1)
+                              - lblEventCardLoc_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =If(IsBlank(ThisItem.Location), "", ThisItem.Location) &
+                                      If(IsBlank(ThisItem.Department), "", If(IsBlank(ThisItem.Location), "", "  ·  ") & ThisItem.Department)
+                                    X: =16
+                                    Y: =60
+                                    Width: =Parent.TemplateWidth - 44
+                                    Height: =20
+                                    AutoHeight: =true
+                                    Size: =11
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - btnEventView_Home:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Text: ="View Sessions"
+                                    X: =16
+                                    Y: =90
+                                    Width: =132
+                                    Height: =34
+                                    Size: =13
+                                    FontWeight: =FontWeight.Semibold
+                                    Appearance: =If(varHomeEventID = ThisItem.ID, ButtonAppearance.Primary, ButtonAppearance.Secondary)
+                                    BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    OnSelect: |-
+                                      =Set(varHomeEventID, ThisItem.ID);
+                                      Reset(cmbHomeEvent)
+                              - btnEventRegister_Home:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Text: ="Register →"
+                                    X: =156
+                                    Y: =90
+                                    Width: =126
+                                    Height: =34
+                                    Size: =13
+                                    FontWeight: =FontWeight.Semibold
+                                    Appearance: =ButtonAppearance.Primary
+                                    BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    OnSelect: |-
+                                      =Set(varSelectedEvent,
+                                          {ID: ThisItem.ID, Title: ThisItem.Title, Description: ThisItem.Description,
+                                           StartDate: ThisItem.StartDate, EndDate: ThisItem.EndDate, Location: ThisItem.Location,
+                                           EventType: ThisItem.EventType, CutoffHours: Coalesce(ThisItem.RegistrationCutoffHours, 48),
+                                           MaxPerUser: Coalesce(ThisItem.MaxPerUser, 0), MeetingLink: ThisItem.MeetingLink,
+                                           Coordinator: ThisItem.Coordinator, POC: ThisItem.POC, POCEmail: ThisItem.POCEmail});
+                                      Set(varDetailEvent, varSelectedEvent);
+                                      Set(varSelectedSlot, Blank());
+                                      Set(varCalDate, Blank());
+                                      Set(varSwitchRegID, 0);
+                                      Set(varDeepLink, true);
+                                      Navigate(scrRegister, ScreenTransition.Fade)
+                  # Available Sessions panel (fills remaining height)
+                  - conPanel_Home:
+                      Control: GroupContainer
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =1
+                        AlignInContainer: =AlignInContainer.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutGap: =8
+                        PaddingTop: =16
+                        PaddingBottom: =12
+                        PaddingLeft: =20
+                        PaddingRight: =20
+                        Fill: =RGBA(255, 255, 255, 1)
+                        BorderColor: =RGBA(228, 231, 239, 1)
+                        BorderThickness: =1
+                        DropShadow: =DropShadow.None
+                        RadiusTopLeft: =13
+                        RadiusTopRight: =13
+                        RadiusBottomLeft: =13
+                        RadiusBottomRight: =13
+                      Children:
+                        - conPanelHead_Home:
+                            Control: GroupContainer
+                            Variant: AutoLayout
+                            Properties:
+                              Height: =46
+                              FillPortions: =0
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutGap: =8
+                              Fill: =RGBA(0, 0, 0, 0)
+                              DropShadow: =DropShadow.None
+                            Children:
+                              - conPanelHeadText_Home:
+                                  Control: GroupContainer
+                                  Variant: AutoLayout
+                                  Properties:
+                                    FillPortions: =1
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    LayoutDirection: =LayoutDirection.Vertical
+                                    LayoutAlignItems: =LayoutAlignItems.Stretch
+                                    LayoutGap: =0
+                                    Fill: =RGBA(0, 0, 0, 0)
+                                    DropShadow: =DropShadow.None
+                                  Children:
+                                    - lblPanelTitle_Home:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: ="Available Sessions"
+                                          Height: =24
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =13
+                                          FontWeight: =FontWeight.Bold
+                                          Color: =RGBA(23, 32, 51, 1)
+                                    - lblPanelSub_Home:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: |-
+                                            =If(!IsBlank(varHomeEventID),
+                                                "Showing sessions for: " & LookUp(colUpcomingEvents, ID = varHomeEventID, Title),
+                                                Text(Today(), "mmm d") & " – " & Text(DateAdd(Today(), 6, TimeUnit.Days), "mmm d, yyyy"))
+                                          Height: =20
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =13
+                                          Color: =RGBA(104, 115, 138, 1)
+                              - cmbHomeEvent:
+                                  Control: ModernCombobox@1.0.0
+                                  Properties:
+                                    Width: =230
+                                    Height: =38
+                                    FillPortions: =0
+                                    Items: =SortByColumns(colUpcomingEvents, "StartDate", SortOrder.Ascending)
+                                    ItemDisplayText: =ThisItem.Title
+                                    InputTextPlaceholder: ="All events"
+                                    DefaultSelectedItems: =Filter(colUpcomingEvents, ID = varHomeEventID)
+                                    OnChange: =Set(varHomeEventID, Self.Selected.ID)
+                                    Font: =Font.'Segoe UI'
+                                    Size: =13
+                              - btnClearHomeEvent:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Text: ="✕"
+                                    Width: =38
+                                    Height: =38
+                                    FillPortions: =0
+                                    Size: =13
+                                    Appearance: =ButtonAppearance.Secondary
+                                    BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                    Visible: =!IsBlank(varHomeEventID)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    OnSelect: |-
+                                      =Set(varHomeEventID, Blank());
+                                      Reset(cmbHomeEvent)
+                              - btnFilterList_Home:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Text: ="☷ List View"
+                                    Width: =110
+                                    Height: =36
+                                    FillPortions: =0
+                                    Size: =13
+                                    Appearance: =If(varHomeView = "calendar", ButtonAppearance.Secondary, ButtonAppearance.Primary)
+                                    BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    OnSelect: =Set(varHomeView, "list")
+                              - btnFilterCalendar_Home:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Text: ="▦ Calendar View"
+                                    Width: =126
+                                    Height: =36
+                                    FillPortions: =0
+                                    Size: =13
+                                    Appearance: =If(varHomeView = "calendar", ButtonAppearance.Primary, ButtonAppearance.Secondary)
+                                    BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    OnSelect: =Set(varHomeView, "calendar")
+                        - recPanelHeadDivider_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: =""
+                              Height: =1
+                              FillPortions: =0
+                              Fill: =RGBA(228, 231, 239, 1)
+                        # Column headers (fractional X = responsive columns)
+                        - conTableHead_Home:
+                            Control: GroupContainer
+                            Variant: ManualLayout
+                            Properties:
+                              Height: =28
+                              FillPortions: =0
+                              Fill: =RGBA(0, 0, 0, 0)
+                              DropShadow: =DropShadow.None
+                              Visible: =varHomeView <> "calendar"
+                            Children:
+                              - lblColDate_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="DATE"
+                                    X: =Parent.Width * 0.02
+                                    Y: =0
+                                    Width: =Parent.Width * 0.17
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblColTime_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="TIME SLOT / EVENT"
+                                    X: =Parent.Width * 0.2
+                                    Y: =0
+                                    Width: =Parent.Width * 0.18
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblColRegistered_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="REGISTERED"
+                                    X: =Parent.Width * 0.4
+                                    Y: =0
+                                    Width: =Parent.Width * 0.08
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblColCapacity_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="CAPACITY"
+                                    X: =Parent.Width * 0.49
+                                    Y: =0
+                                    Width: =Parent.Width * 0.08
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblColStatus_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="STATUS"
+                                    X: =Parent.Width * 0.58
+                                    Y: =0
+                                    Width: =Parent.Width * 0.12
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblColAction_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="ACTION"
+                                    X: =Parent.Width - 130
+                                    Y: =0
+                                    Width: =110
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                        # Empty state when the (filtered) week has no sessions
+                        - lblNoSessions_Home:
+                            Control: ModernText@1.0.0
+                            Properties:
+                              Text: |-
+                                =If(!IsBlank(varHomeEventID),
+                                    "No sessions are available for """ & LookUp(colUpcomingEvents, ID = varHomeEventID, Title) & """ in the next 7 days. Use the Register button on the event card above to browse all of its dates.",
+                                    "No sessions are available this week.")
+                              Height: =56
+                              AutoHeight: =true
+                              FillPortions: =0
+                              Size: =13
+                              Wrap: =true
+                              Align: =Align.Center
+                              Color: =RGBA(104, 115, 138, 1)
+                              Fill: =RGBA(246, 247, 251, 1)
+                              RadiusTopLeft: =8
+                              RadiusTopRight: =8
+                              RadiusBottomLeft: =8
+                              RadiusBottomRight: =8
+                              Visible: =CountRows(Filter(colWeekSlots, IsBlank(varHomeEventID) || EventID = varHomeEventID)) = 0
+                        # Sessions table (gallery scrolls inside the panel)
+                        - galSessions_Home:
+                            Control: Gallery
+                            Variant: Vertical
+                            Properties:
+                              FillPortions: =1
+                              AlignInContainer: =AlignInContainer.Stretch
+                              TemplateSize: =56
+                              TemplatePadding: =0
+                              ShowScrollbar: =false
+                              Visible: =varHomeView <> "calendar"
+                              Items: |-
+                                =Filter(
+                                    AddColumns(
+                                        SortByColumns(colWeekSlots, "SessionDate", SortOrder.Ascending, "SortOrder", SortOrder.Ascending),
+                                        Registered, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId))),
+                                        Mine, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId, UserEmail = Lower(User().Email)))),
+                                        SlotStart, If(IsBlank(ThisRecord.DurationMinutes),
+                                            DateAdd(ThisRecord.SessionDate, Switch(ThisRecord.SortOrder, 1, 9, 2, 10, 3, 11, 4, 13, 5, 14, 9), TimeUnit.Hours),
+                                            DateAdd(ThisRecord.SessionDate, ThisRecord.SortOrder, TimeUnit.Minutes)),
+                                        CutoffH, With({eid: EventID}, Coalesce(LookUp(EventSessionRegistration_Events, ID = eid, RegistrationCutoffHours), 48))),
+                                    IsBlank(varHomeEventID) || EventID = varHomeEventID)
+                            Children:
+                              - lblRowDate_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Text(ThisItem.SessionDate, "ddd, mmm d, yyyy")
+                                    X: =Parent.TemplateWidth * 0.02
+                                    Y: =14
+                                    Width: =Parent.TemplateWidth * 0.17
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =13
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblRowTime_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =ThisItem.Title
+                                    X: =Parent.TemplateWidth * 0.2
+                                    Y: =7
+                                    Width: =Parent.TemplateWidth * 0.18
+                                    Height: =24
+                                    AutoHeight: =true
+                                    Size: =13
+                                    FontWeight: =FontWeight.Bold
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblRowEvent_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =ThisItem.EventName
+                                    X: =Parent.TemplateWidth * 0.2
+                                    Y: =30
+                                    Width: =Parent.TemplateWidth * 0.18
+                                    Height: =20
+                                    AutoHeight: =true
+                                    Size: =11
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblRowRegistered_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Text(ThisItem.Registered)
+                                    X: =Parent.TemplateWidth * 0.4
+                                    Y: =14
+                                    Width: =Parent.TemplateWidth * 0.08
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =13
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblRowCapacity_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Text(ThisItem.Capacity)
+                                    X: =Parent.TemplateWidth * 0.49
+                                    Y: =14
+                                    Width: =Parent.TemplateWidth * 0.08
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =13
+                                    Color: =RGBA(23, 32, 51, 1)
+                              - lblRowBadge_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =If(ThisItem.Mine > 0, "Registered ✓",
+                                          ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), "Closed",
+                                          With({left: ThisItem.Capacity - ThisItem.Registered},
+                                              If(left = 0, "Full", left & " spots left")))
+                                    X: =Parent.TemplateWidth * 0.58
+                                    Y: =15
+                                    Width: =120
+                                    Height: =26
+                                    AutoHeight: =true
+                                    Size: =12
+                                    FontWeight: =FontWeight.Semibold
+                                    Align: =Align.Center
+                                    Fill: |-
+                                      =If(ThisItem.Mine > 0, RGBA(55, 63, 75, 1),
+                                          ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(238, 240, 246, 1),
+                                          With({left: ThisItem.Capacity - ThisItem.Registered},
+                                              If(left = 0, RGBA(253, 236, 238, 1),
+                                                 left <= 4, RGBA(255, 244, 223, 1),
+                                                 RGBA(233, 248, 241, 1))))
+                                    Color: |-
+                                      =If(ThisItem.Mine > 0, RGBA(255, 255, 255, 1),
+                                          ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(104, 115, 138, 1),
+                                          With({left: ThisItem.Capacity - ThisItem.Registered},
+                                              If(left = 0, RGBA(216, 75, 82, 1),
+                                                 left <= 4, RGBA(199, 122, 0, 1),
+                                                 RGBA(21, 150, 106, 1))))
+                                    RadiusTopLeft: =13
+                                    RadiusTopRight: =13
+                                    RadiusBottomLeft: =13
+                                    RadiusBottomRight: =13
+                              - btnRowRegister_Home:
+                                  Control: ModernButton@1.0.0
+                                  Properties:
+                                    Text: |-
+                                      =If(ThisItem.Mine > 0, "⇄ Switch",
+                                          ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), "Closed",
+                                          ThisItem.Registered >= ThisItem.Capacity, "Full",
+                                          "Register")
+                                    X: =Parent.TemplateWidth - 130
+                                    Y: =12
+                                    Width: =110
+                                    Height: =32
+                                    Size: =13
+                                    Appearance: =If(ThisItem.Mine > 0, ButtonAppearance.Secondary, ButtonAppearance.Primary)
+                                    BasePaletteColor: =RGBA(55, 63, 75, 1)
+                                    DisplayMode: |-
+                                      =If(ThisItem.Mine > 0,
+                                          If(ThisItem.SlotStart < Now(), DisplayMode.Disabled, DisplayMode.Edit),
+                                          ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours) ||
+                                          ThisItem.Registered >= ThisItem.Capacity,
+                                          DisplayMode.Disabled, DisplayMode.Edit)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                                    OnSelect: |-
+                                      =If(ThisItem.Mine > 0,
+                                          With({r: LookUp(colFutureRegs, SlotID = ThisItem.ID && UserEmail = Lower(User().Email))},
+                                              Set(varSwitchRegID, r.ID);
+                                              Set(varSwitchRegLabel, Text(r.SessionDate, "ddd, mmm d") & " · " & r.TimeSlot)),
+                                          Set(varSwitchRegID, 0));
+                                      Set(varSelectedSlot, Blank());
+                                      Set(varDeepLink, true);
+                                      Set(varSelectedEvent,
+                                          With({e: LookUp(EventSessionRegistration_Events, ID = ThisItem.EventID)},
+                                              {ID: e.ID, Title: e.Title, Description: e.Description,
+                                               StartDate: e.StartDate, EndDate: e.EndDate, Location: e.Location,
+                                               EventType: e.EventType, CutoffHours: Coalesce(e.RegistrationCutoffHours, 48),
+                                               MaxPerUser: Coalesce(e.MaxPerUser, 0), MeetingLink: e.MeetingLink,
+                                               Coordinator: e.Coordinator, POC: e.POC, POCEmail: e.POCEmail}));
+                                      Set(varDetailEvent, varSelectedEvent);
+                                      Set(varCalDate, ThisItem.SessionDate);
+                                      Navigate(scrRegister, ScreenTransition.Fade)
+                              - recRowDivider_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =""
+                                    X: =0
+                                    Y: =55
+                                    Width: =Parent.TemplateWidth
+                                    Height: =1
+                                    Fill: =RGBA(238, 240, 245, 1)
+                        # Calendar view: one column per day, slots as color-coded chips
+                        - galCalDays_Home:
+                            Control: Gallery
+                            Variant: Horizontal
+                            Properties:
+                              FillPortions: =1
+                              AlignInContainer: =AlignInContainer.Stretch
+                              TemplateSize: |-
+                                =Max(160, (Self.Width - 8) / Max(1, CountRows(Distinct(
+                                    Filter(colWeekSlots, IsBlank(varHomeEventID) || EventID = varHomeEventID),
+                                    SessionDate))))
+                              TemplatePadding: =4
+                              ShowScrollbar: =false
+                              Visible: =varHomeView = "calendar"
+                              Items: |-
+                                =SortByColumns(Distinct(
+                                    Filter(colWeekSlots, IsBlank(varHomeEventID) || EventID = varHomeEventID),
+                                    SessionDate), "Value", SortOrder.Ascending)
+                            Children:
+                              - lblCalDayHead_Home:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Text(ThisItem.Value, "ddd, mmm d")
+                                    X: =2
+                                    Y: =0
+                                    Width: =Parent.TemplateWidth - 8
+                                    Height: =34
+                                    AutoHeight: =true
+                                    Size: =13
+                                    FontWeight: =FontWeight.Bold
+                                    Align: =Align.Center
+                                    Color: =RGBA(23, 32, 51, 1)
+                                    Fill: =RGBA(238, 240, 246, 1)
+                                    RadiusTopLeft: =8
+                                    RadiusTopRight: =8
+                                    RadiusBottomLeft: =8
+                                    RadiusBottomRight: =8
+                              - galCalSlots_Home:
+                                  Control: Gallery
+                                  Variant: Vertical
+                                  Properties:
+                                    X: =2
+                                    Y: =40
+                                    Width: =Parent.TemplateWidth - 8
+                                    Height: =Parent.TemplateHeight - 44
+                                    TemplateSize: =64
+                                    TemplatePadding: =3
+                                    ShowScrollbar: =false
+                                    Items: |-
+                                      =AddColumns(
+                                          SortByColumns(
+                                              Filter(colWeekSlots, SessionDate = ThisItem.Value,
+                                                  IsBlank(varHomeEventID) || EventID = varHomeEventID),
+                                              "SortOrder", SortOrder.Ascending),
+                                        Registered, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId))),
+                                        Mine, With({slotId: ID}, CountRows(Filter(colFutureRegs, SlotID = slotId, UserEmail = Lower(User().Email)))),
+                                        SlotStart, If(IsBlank(ThisRecord.DurationMinutes),
+                                            DateAdd(ThisRecord.SessionDate, Switch(ThisRecord.SortOrder, 1, 9, 2, 10, 3, 11, 4, 13, 5, 14, 9), TimeUnit.Hours),
+                                            DateAdd(ThisRecord.SessionDate, ThisRecord.SortOrder, TimeUnit.Minutes)),
+                                        CutoffH, With({eid: EventID}, Coalesce(LookUp(EventSessionRegistration_Events, ID = eid, RegistrationCutoffHours), 48)))
+                                  Children:
+                                    - recCalSlot_Home:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: |-
+                                            =ThisItem.Title & Char(10) &
+                                            If(ThisItem.Mine > 0, "✓ Registered · tap to switch",
+                                               ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), "Closed",
+                                               ThisItem.Registered >= ThisItem.Capacity, "Full",
+                                               ThisItem.Registered & "/" & ThisItem.Capacity & " registered")
+                                          X: =0
+                                          Y: =0
+                                          Width: =Parent.TemplateWidth
+                                          Height: =58
+                                          Size: =12
+                                          FontWeight: =FontWeight.Semibold
+                                          Align: =Align.Center
+                                          Wrap: =true
+                                          Fill: |-
+                                            =If(ThisItem.Mine > 0, RGBA(55, 63, 75, 1),
+                                                ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(238, 240, 246, 1),
+                                                With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                    If(left = 0, RGBA(253, 236, 238, 1),
+                                                       left <= 4, RGBA(255, 244, 223, 1),
+                                                       RGBA(233, 248, 241, 1))))
+                                          Color: |-
+                                            =If(ThisItem.Mine > 0, RGBA(255, 255, 255, 1),
+                                                ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours), RGBA(104, 115, 138, 1),
+                                                With({left: ThisItem.Capacity - ThisItem.Registered},
+                                                    If(left = 0, RGBA(216, 75, 82, 1),
+                                                       left <= 4, RGBA(199, 122, 0, 1),
+                                                       RGBA(21, 150, 106, 1))))
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                    - btnCalSlot_Home:
+                                        Control: ModernButton@1.0.0
+                                        Properties:
+                                          Text: =""
+                                          X: =0
+                                          Y: =0
+                                          Width: =Parent.TemplateWidth
+                                          Height: =58
+                                          Appearance: =ButtonAppearance.Transparent
+                                          RadiusTopLeft: =8
+                                          RadiusTopRight: =8
+                                          RadiusBottomLeft: =8
+                                          RadiusBottomRight: =8
+                                          OnSelect: |-
+                                            =If(ThisItem.Mine > 0 && ThisItem.SlotStart < Now(),
+                                                Notify("This session has already started.", NotificationType.Information),
+                                            ThisItem.Mine = 0 && ThisItem.SlotStart < DateAdd(Now(), ThisItem.CutoffH, TimeUnit.Hours),
+                                                Notify("Registration closes " & ThisItem.CutoffH & " hours before the session starts.", NotificationType.Warning),
+                                            ThisItem.Mine = 0 && ThisItem.Capacity - ThisItem.Registered <= 0,
+                                                Notify("This session is full.", NotificationType.Warning),
+                                            If(ThisItem.Mine > 0,
+                                                With({r: LookUp(colFutureRegs, SlotID = ThisItem.ID && UserEmail = Lower(User().Email))},
+                                                    Set(varSwitchRegID, r.ID);
+                                                    Set(varSwitchRegLabel, Text(r.SessionDate, "ddd, mmm d") & " · " & r.TimeSlot)),
+                                                Set(varSwitchRegID, 0));
+                                            Set(varSelectedSlot, Blank());
+                                            Set(varDeepLink, true);
+                                            Set(varSelectedEvent,
+                                                With({e: LookUp(EventSessionRegistration_Events, ID = ThisItem.EventID)},
+                                                    {ID: e.ID, Title: e.Title, Description: e.Description,
+                                                     StartDate: e.StartDate, EndDate: e.EndDate, Location: e.Location,
+                                                     EventType: e.EventType, CutoffHours: Coalesce(e.RegistrationCutoffHours, 48),
+                                                     MaxPerUser: Coalesce(e.MaxPerUser, 0), MeetingLink: e.MeetingLink,
+                                                     Coordinator: e.Coordinator, POC: e.POC, POCEmail: e.POCEmail}));
+                                            Set(varDetailEvent, varSelectedEvent);
+                                            Set(varCalDate, ThisItem.SessionDate);
+                                            Navigate(scrRegister, ScreenTransition.Fade))

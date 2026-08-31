@@ -1,0 +1,317 @@
+# =============================================================
+# scrIntro - Welcome / landing page (RESPONSIVE, MODERN CONTROLS)
+# Full-screen dark hero: logo, organization name, about the event,
+# event detail chips, and Get Started / Learn More buttons.
+# If an event is promoted (Settings > Promote Event), a Featured
+# Event card appears with View Details / Register buttons.
+# Set this screen as the app StartScreen (App > StartScreen: scrIntro).
+# Upload your images in Studio (Media) and set:
+#   imgIntroLogo.Image       -> your logo
+#   imgIntroBackground.Image -> your background photo (optional)
+# =============================================================
+Screens:
+  scrIntro:
+    Properties:
+      Fill: =RGBA(24, 27, 33, 1)
+      OnVisible: |-
+        =Set(varPromoEvent,
+            LookUp(EventSessionRegistration_Events,
+                IsPromoted = true && IsActive = true && EndDate >= Today()))
+    Children:
+      - imgIntroBackground:
+          Control: Image
+          Properties:
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            ImagePosition: =ImagePosition.Fill
+      - conIntroOverlay:
+          Control: GroupContainer
+          Variant: ManualLayout
+          Properties:
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            Fill: =RGBA(17, 19, 24, 0.72)
+            DropShadow: =DropShadow.None
+      - conIntro:
+          Control: GroupContainer
+          Variant: AutoLayout
+          Properties:
+            X: =0
+            Y: =0
+            Width: =Parent.Width
+            Height: =Parent.Height
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutJustifyContent: =LayoutJustifyContent.Center
+            LayoutGap: =14
+            PaddingLeft: =40
+            PaddingRight: =40
+            Fill: =RGBA(0, 0, 0, 0)
+            DropShadow: =DropShadow.None
+          Children:
+            - imgIntroLogo:
+                Control: Image
+                Properties:
+                  Width: =96
+                  Height: =96
+                  FillPortions: =0
+                  ImagePosition: =ImagePosition.Fit
+                  Fill: =RGBA(255, 255, 255, 0.08)
+                  RadiusTopLeft: =16
+                  RadiusTopRight: =16
+                  RadiusBottomLeft: =16
+                  RadiusBottomRight: =16
+            - lblIntroOrg:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Your Organization Name"
+                  Height: =52
+                  AutoHeight: =true
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Stretch
+                  Size: =26
+                  FontWeight: =FontWeight.Bold
+                  Color: =RGBA(255, 255, 255, 1)
+                  Align: =Align.Center
+            - lblIntroSubtitle:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="WEEKLY SESSION REGISTRATION"
+                  Height: =28
+                  AutoHeight: =true
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Stretch
+                  Size: =12
+                  FontWeight: =FontWeight.Semibold
+                  Color: =RGBA(158, 165, 177, 1)
+                  Align: =Align.Center
+            - lblIntroAbout:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Join us for our weekly training sessions. Reserve your seat in one of the hourly time slots offered Monday through Friday, from 9:00 AM to 3:00 PM. Space is limited to 20 participants per slot, so book early to secure your spot."
+                  Width: =640
+                  Height: =90
+                  AutoHeight: =true
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Center
+                  Size: =13
+                  Color: =RGBA(203, 208, 217, 1)
+                  Align: =Align.Center
+                  Wrap: =true
+            - conIntroChips:
+                Control: GroupContainer
+                Variant: AutoLayout
+                Properties:
+                  Height: =40
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutJustifyContent: =LayoutJustifyContent.Center
+                  LayoutGap: =10
+                  Fill: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                Children:
+                  - lblChipWhen:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: ="◷  Mon – Fri, 9:00 AM – 3:00 PM"
+                        Width: =300
+                        Height: =36
+                        AutoHeight: =true
+                        FillPortions: =0
+                        Size: =14
+                        Color: =RGBA(255, 255, 255, 1)
+                        Align: =Align.Center
+                        Fill: =RGBA(255, 255, 255, 0.1)
+                  - lblChipDuration:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: ="▦  1-hour sessions"
+                        Width: =200
+                        Height: =36
+                        AutoHeight: =true
+                        FillPortions: =0
+                        Size: =14
+                        Color: =RGBA(255, 255, 255, 1)
+                        Align: =Align.Center
+                        Fill: =RGBA(255, 255, 255, 0.1)
+                  - lblChipSeats:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: ="◉  20 seats per slot"
+                        Width: =210
+                        Height: =36
+                        AutoHeight: =true
+                        FillPortions: =0
+                        Size: =14
+                        Color: =RGBA(255, 255, 255, 1)
+                        Align: =Align.Center
+                        Fill: =RGBA(255, 255, 255, 0.1)
+            # ---------------- FEATURED (PROMOTED) EVENT CARD ----------------
+            - conIntroPromo:
+                Control: GroupContainer
+                Variant: AutoLayout
+                Properties:
+                  Width: =640
+                  Height: =188
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Center
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutGap: =6
+                  PaddingTop: =18
+                  PaddingBottom: =18
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  Fill: =RGBA(255, 255, 255, 0.08)
+                  DropShadow: =DropShadow.None
+                  RadiusTopLeft: =14
+                  RadiusTopRight: =14
+                  RadiusBottomLeft: =14
+                  RadiusBottomRight: =14
+                  Visible: =!IsBlank(varPromoEvent)
+                Children:
+                  - lblPromoTag:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: ="★  FEATURED EVENT"
+                        Height: =18
+                        AutoHeight: =true
+                        FillPortions: =0
+                        AlignInContainer: =AlignInContainer.Stretch
+                        Size: =11
+                        FontWeight: =FontWeight.Semibold
+                        Color: =RGBA(255, 205, 122, 1)
+                        Align: =Align.Center
+                  - lblPromoName:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: =Coalesce(varPromoEvent.Title, "")
+                        Height: =30
+                        AutoHeight: =true
+                        FillPortions: =0
+                        AlignInContainer: =AlignInContainer.Stretch
+                        Size: =19
+                        FontWeight: =FontWeight.Bold
+                        Color: =RGBA(255, 255, 255, 1)
+                        Align: =Align.Center
+                        Wrap: =true
+                  - lblPromoInfo:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: |-
+                          =Text(varPromoEvent.StartDate, "mmm d") & " – " & Text(varPromoEvent.EndDate, "mmm d, yyyy") &
+                          If(IsBlank(varPromoEvent.Location), "", "  ·  " & varPromoEvent.Location) &
+                          If(IsBlank(varPromoEvent.EventType), "", "  ·  " & varPromoEvent.EventType)
+                        Height: =20
+                        AutoHeight: =true
+                        FillPortions: =0
+                        AlignInContainer: =AlignInContainer.Stretch
+                        Size: =13
+                        Color: =RGBA(203, 208, 217, 1)
+                        Align: =Align.Center
+                        Wrap: =true
+                  - conPromoBtns:
+                      Control: GroupContainer
+                      Variant: AutoLayout
+                      Properties:
+                        Height: =52
+                        FillPortions: =0
+                        AlignInContainer: =AlignInContainer.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutJustifyContent: =LayoutJustifyContent.Center
+                        LayoutGap: =12
+                        PaddingTop: =8
+                        Fill: =RGBA(0, 0, 0, 0)
+                        DropShadow: =DropShadow.None
+                      Children:
+                        - btnPromoRegister:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="Register Now"
+                              Width: =160
+                              Height: =42
+                              FillPortions: =0
+                              Size: =13
+                              FontWeight: =FontWeight.Semibold
+                              Appearance: =ButtonAppearance.Secondary
+                              OnSelect: |-
+                                =Set(varSelectedEvent,
+                                    {ID: varPromoEvent.ID, Title: varPromoEvent.Title, Description: varPromoEvent.Description,
+                                     StartDate: varPromoEvent.StartDate, EndDate: varPromoEvent.EndDate, Location: varPromoEvent.Location,
+                                     EventType: varPromoEvent.EventType, CutoffHours: Coalesce(varPromoEvent.RegistrationCutoffHours, 48),
+                                     MaxPerUser: Coalesce(varPromoEvent.MaxPerUser, 0), MeetingLink: varPromoEvent.MeetingLink,
+                                     Coordinator: varPromoEvent.Coordinator, POC: varPromoEvent.POC, POCEmail: varPromoEvent.POCEmail});
+                                Set(varDetailEvent, varSelectedEvent);
+                                Set(varSelectedSlot, Blank());
+                                Set(varCalDate, Blank());
+                                Set(varSwitchRegID, 0);
+                                Set(varDeepLink, true);
+                                Navigate(scrRegister, ScreenTransition.Fade)
+                        - btnPromoDetails:
+                            Control: ModernButton@1.0.0
+                            Properties:
+                              Text: ="View Details"
+                              Width: =150
+                              Height: =42
+                              FillPortions: =0
+                              Size: =13
+                              Appearance: =ButtonAppearance.Transparent
+                              Color: =RGBA(255, 255, 255, 1)
+                              OnSelect: |-
+                                =Set(varDetailEventID, varPromoEvent.ID);
+                                Set(varDeepEvent, false);
+                                Navigate(scrEventDetails, ScreenTransition.Fade)
+            - conIntroActions:
+                Control: GroupContainer
+                Variant: AutoLayout
+                Properties:
+                  Height: =64
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutJustifyContent: =LayoutJustifyContent.Center
+                  LayoutGap: =12
+                  PaddingTop: =10
+                  Fill: =RGBA(0, 0, 0, 0)
+                  DropShadow: =DropShadow.None
+                Children:
+                  - btnIntroStart:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Text: ="Get Started"
+                        Width: =180
+                        Height: =46
+                        FillPortions: =0
+                        Size: =13
+                        Appearance: =ButtonAppearance.Secondary
+                        OnSelect: =Navigate(scrHome, ScreenTransition.Fade)
+                  - btnIntroLearnMore:
+                      Control: ModernButton@1.0.0
+                      Properties:
+                        Text: ="Learn More"
+                        Width: =160
+                        Height: =46
+                        FillPortions: =0
+                        Size: =13
+                        Appearance: =ButtonAppearance.Transparent
+                        Color: =RGBA(255, 255, 255, 1)
+                        OnSelect: =Navigate(scrHelp, ScreenTransition.Fade)
+            - lblIntroFooter:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="Questions? Visit the Help / FAQ page or contact the events team."
+                  Height: =24
+                  AutoHeight: =true
+                  FillPortions: =0
+                  AlignInContainer: =AlignInContainer.Stretch
+                  Size: =13
+                  Color: =RGBA(122, 130, 143, 1)
+                  Align: =Align.Center

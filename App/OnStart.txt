@@ -1,0 +1,198 @@
+// ============================================================
+// App.OnStart
+// In Studio: select the "App" object at the top of the Tree view,
+// pick the OnStart property in the dropdown, and paste everything
+// in the block below (comments are allowed in Power Fx).
+//
+// This preloads the collections so the first screen renders with
+// data immediately. The screens still refresh these collections in
+// their own OnVisible, so data stays current as you navigate.
+// ============================================================
+
+// Current user info (handy for formulas and debugging)
+Set(varUserName, User().FullName);
+Set(varUserEmail, Lower(User().Email));
+
+// ------------------------------------------------------------
+// App link + deep linking (Share Event feature).
+// varAppURL: after the FIRST publish, get the app's web link
+// (make.powerapps.com > Apps > ... on the app > Details > Web link)
+// and paste it between the quotes below, then publish again.
+// The Share Event modal appends ?eventid=<ID> to this link.
+// When someone opens such a link, the "eventid" parameter below
+// routes them straight to that event's detail page (also set the
+// App's StartScreen property - see the note at the very bottom).
+// ------------------------------------------------------------
+Set(varAppURL, "");
+If(!IsBlank(Param("eventid")),
+    Set(varDetailEventID, Value(Param("eventid")));
+    Set(varDeepEvent, true));
+
+// ------------------------------------------------------------
+// Role lookup (EventSessionRegistration_AppRoles list).
+//   UserEmail = Person column (people picker - no typos possible)
+//   Role      = Choice column with exactly two choices: Admin, Coordinator
+// The person-column comparison isn't delegable, so the list is collected
+// first and the lookup runs in memory - no delegation warning.
+// Bootstrap: while EventSessionRegistration_AppRoles has no rows yet, everyone is treated
+// as an Admin so you can't lock yourself out. Add your own row
+// (Role = Admin) first, then add the others.
+// ------------------------------------------------------------
+// Collect the tiny roles list first, then look up in memory - collections
+// aren't delegable sources, so this raises no delegation warning (the list
+// stays far below the data-row limit).
+ClearCollect(colAppRoles, EventSessionRegistration_AppRoles);
+Set(varMyRole, LookUp(colAppRoles, Lower(UserEmail.Email) = Lower(User().Email), Role.Value));
+Set(varRolesConfigured, !IsEmpty(colAppRoles));
+Set(varIsAdmin, If(varRolesConfigured, varMyRole = "Admin", true));
+Set(varIsCoordinator, varIsAdmin || varMyRole = "Coordinator");
+
+// Sidebar default: open for admins/coordinators, collapsed for everyone else.
+// Every screen has a ☰ button in its header to toggle it at any time.
+Set(varSidebarOpen, varIsCoordinator);
+
+// This week's active time slots (delegable filter)
+ClearCollect(
+    colWeekSlots,
+    Filter(
+        EventSessionRegistration_SessionTimeSlots,
+        IsActive = true,
+        SessionDate >= Today(),
+        SessionDate < DateAdd(Today(), 7, TimeUnit.Days)
+    )
+);
+
+// All future confirmed registrations (delegable filter)
+ClearCollect(
+    colFutureRegs,
+    Filter(
+        EventSessionRegistration_Registrations,
+        Status = "Confirmed",
+        SessionDate >= Today()
+    )
+);
+
+// Current user's confirmed registrations (delegable filter)
+ClearCollect(
+    colMyRegsAll,
+    Filter(
+        EventSessionRegistration_Registrations,
+        UserEmail = Lower(User().Email),
+        Status = "Confirmed"
+    )
+)
+
+// ============================================================
+// REFERENCE - per-screen OnVisible formulas (set these too;
+// pasting controls does not carry screen properties).
+// ============================================================
+//
+// scrHome (colUpcomingEvents feeds the Upcoming Events cards and the
+// event filter dropdown; loading it here keeps CountRows/IsEmpty checks
+// delegation-clean. EventSessionRegistration_Events with an AudienceGroupID are removed unless the
+// current user is a member of that Microsoft 365 group - requires the
+// Office 365 Groups connector):
+//   ClearCollect(colWeekSlots, Filter(EventSessionRegistration_SessionTimeSlots, IsActive = true, SessionDate >= Today(), SessionDate < DateAdd(Today(), 7, TimeUnit.Days)));
+//   ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+//   ClearCollect(colUpcomingEvents, Filter(EventSessionRegistration_Events, IsActive = true, EndDate >= Today()));
+//   ClearCollect(colRestrictedEv_Home, Filter(colUpcomingEvents, !IsBlank(AudienceGroupID)));
+//   ForAll(colRestrictedEv_Home,
+//       With({gid: AudienceGroupID, evid: ID},
+//           With({member: IfError(
+//                   LookUp(Office365Groups.ListGroupMembers(gid).value,
+//                       Lower(Coalesce(mail, userPrincipalName)) = Lower(User().Email)),
+//                   Blank())},
+//               If(IsBlank(member),
+//                   Remove(colUpcomingEvents, LookUp(colUpcomingEvents, ID = evid))))))
+//
+// scrAdmin (colAdminSlots = ALL upcoming sessions incl. inactive - no 7-day
+// cap, so sessions created for future event dates show in the table; also
+// loads colEvents and colAdminRegs (last 90 days of registrations, feeds the
+// Dashboard, EventSessionRegistration_Registrations, and Reports tabs), defaults the view to the
+// Dashboard tab, and initialises the Sessions/Events tabs' list/calendar
+// toggles and calendar month/day selection.
+// Role-aware: the loads only run for coordinators/admins. Non-coordinators
+// see a full-screen "Admin access required" overlay (conNoAccess_Admin in
+// the YAML) with a Go-to-Home button - Power Apps doesn't allow Navigate
+// inside OnVisible, so the guard is visual instead of a redirect.
+// Coordinators (non-admin) only get events where CoordinatorEmail = their
+// email, and their sessions/registrations are trimmed to those events:
+//   If(varIsCoordinator,
+//       ClearCollect(colWeekSlots, Filter(EventSessionRegistration_SessionTimeSlots, IsActive = true, SessionDate >= Today(), SessionDate < DateAdd(Today(), 7, TimeUnit.Days)));
+//       ClearCollect(colAdminSlots, Filter(EventSessionRegistration_SessionTimeSlots, SessionDate >= Today()));
+//       ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+//       If(varIsAdmin,
+//           ClearCollect(colEvents, EventSessionRegistration_Events),
+//           ClearCollect(colEvents, Filter(EventSessionRegistration_Events, CoordinatorEmail = varUserEmail)));
+//       ClearCollect(colAdminRegs, Filter(EventSessionRegistration_Registrations, SessionDate >= DateAdd(Today(), -90, TimeUnit.Days)));
+//       If(!varIsAdmin,
+//           RemoveIf(colAdminSlots, !(EventID in colEvents.ID));
+//           RemoveIf(colAdminRegs, !(EventID in colEvents.ID)));
+//       Set(varAdminTab, "dashboard");
+//       Set(varAdminSessView, "list");
+//       Set(varAdminEvView, "list");
+//       Set(varAdminCalSel, Today());
+//       Set(varAdminCalMonth, Date(Year(Today()), Month(Today()), 1)))
+//
+// scrRegister (deep-link aware: when Home sends the user here with an
+// event already chosen, varDeepLink is true and the wizard opens on
+// step 2 - Select Session - with the calendar focused on the handed-off
+// date. Otherwise it starts fresh on step 1. colRegEventSlots feeds the
+// step-2 calendar and is also reloaded when an event is picked in step 1.
+// colRegVisibleEvents feeds the step-1 event list, minus restricted events
+// the user isn't in the audience group for):
+//   ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+//   ClearCollect(colRegVisibleEvents, Filter(EventSessionRegistration_Events, IsActive = true, EndDate >= Today()));
+//   ClearCollect(colRestrictedEv_Reg, Filter(colRegVisibleEvents, !IsBlank(AudienceGroupID)));
+//   ForAll(colRestrictedEv_Reg,
+//       With({gid: AudienceGroupID, evid: ID},
+//           With({member: IfError(
+//                   LookUp(Office365Groups.ListGroupMembers(gid).value,
+//                       Lower(Coalesce(mail, userPrincipalName)) = Lower(User().Email)),
+//                   Blank())},
+//               If(IsBlank(member),
+//                   Remove(colRegVisibleEvents, LookUp(colRegVisibleEvents, ID = evid))))));
+//   Set(varRegView, "calendar");
+//   If(varDeepLink,
+//       Set(varDeepLink, false);
+//       Set(varRegStep, 2);
+//       ClearCollect(colRegEventSlots, Filter(EventSessionRegistration_SessionTimeSlots, EventID = varSelectedEvent.ID, IsActive = true, SessionDate >= Today()));
+//       Set(varRegCalSel, Coalesce(varCalDate, Today()));
+//       Set(varRegCalMonth, Date(Year(varRegCalSel), Month(varRegCalSel), 1)),
+//       Set(varRegStep, 1);
+//       Set(varSelectedEvent, Blank());
+//       Set(varDetailEvent, Blank());
+//       Set(varSelectedSlot, Blank());
+//       Set(varCalDate, Blank());
+//       Set(varSwitchRegID, 0);
+//       Set(varSwitchRegLabel, "");
+//       Clear(colRegEventSlots);
+//       Set(varRegCalSel, Today());
+//       Set(varRegCalMonth, Date(Year(Today()), Month(Today()), 1)))
+//
+// scrProfile:
+//   ClearCollect(colMyRegsAll, Filter(EventSessionRegistration_Registrations, UserEmail = Lower(User().Email), Status = "Confirmed"))
+//
+// scrEventDetails (drill-in page; varDetailEventID is set by whichever
+// screen navigates here - Home, Register, My Registrations, Confirmation):
+//   Set(varEventDetail, LookUp(EventSessionRegistration_Events, ID = varDetailEventID));
+//   ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+//   ClearCollect(colEventDetailSlots, Filter(EventSessionRegistration_SessionTimeSlots, EventID = varDetailEventID, IsActive = true, SessionDate >= Today()));
+//   Set(varEvDetView, "calendar");
+//   Set(varEvDetCalSel, Coalesce(First(SortByColumns(colEventDetailSlots, "SessionDate", SortOrder.Ascending)).SessionDate, Today()));
+//   Set(varEvDetCalMonth, Date(Year(varEvDetCalSel), Month(varEvDetCalSel), 1))
+//
+// scrSettings (drill-in page from the Admin header's gear button; loads the
+// email templates for the Email Templates tab. Admin-only - non-admins see
+// the full-screen "Admin access required" overlay (conNoAccess_Set) with a
+// Go-to-Home button instead of a redirect):
+//   If(varIsAdmin,
+//       ClearCollect(colEmailTemplates, EventSessionRegistration_EmailTemplates);
+//       Set(varSettingsTab, "email");
+//       Set(varShowTplModal, false))
+//
+// scrIntro, scrMyRegistrations, scrHelp: no OnVisible needed.
+//
+// Also set (on the App object) the StartScreen property. It routes
+// Share Event deep links (?eventid=...) straight to the detail page:
+//   StartScreen = If(!IsBlank(Param("eventid")), scrEventDetails, scrIntro)
