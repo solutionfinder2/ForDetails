@@ -395,6 +395,7 @@ After they work:
 2. Add connection references for Outlook, SharePoint, and OneDrive.
 3. Export unmanaged for backup / other environments.
 
-For a ready-made package instead of manual build, use
-`Flow/EventSessionRegistrationFlows_NoTemplates_1_0_0_9.zip` and
-`Flow/SolutionPackage-NoTemplates/IMPORT.md`.
+For ready-made packages instead of manual build, import the zips in
+`Packages/` via **My flows → Import → Import Package (Legacy)**
+(see `Packages/IMPORT.md`). Do not use the Dataverse solution zip under
+`SolutionPackage-NoTemplates/` — Power Platform rejects that format.
