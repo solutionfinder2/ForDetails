@@ -1,0 +1,153 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_office365": {
+        "impersonation": {},
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "wsr_sharedoffice365"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Subject",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Calendar event subject",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Body",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Calendar event body (plain text)",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "Start",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Start time, yyyy-MM-ddTHH:mm:ss (local)",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_3": {
+                  "title": "End",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "End time, yyyy-MM-ddTHH:mm:ss (local)",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_4": {
+                  "title": "Location",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Event location",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text",
+                "text_1",
+                "text_2",
+                "text_3",
+                "text_4"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_calendars_(V2)": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+              "connectionName": "shared_office365",
+              "operationId": "CalendarGetTables_V2"
+            },
+            "parameters": {},
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Create_event_(V4)": {
+          "runAfter": {
+            "Get_calendars_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+              "connectionName": "shared_office365",
+              "operationId": "V4CalendarPostItem"
+            },
+            "parameters": {
+              "table": "@coalesce(first(outputs('Get_calendars_(V2)')?['body/value'])?['id'], first(outputs('Get_calendars_(V2)')?['body/value'])?['Id'], first(outputs('Get_calendars_(V2)')?['body/value'])?['Name'])",
+              "item/subject": "@triggerBody()?['text']",
+              "item/start": "@triggerBody()?['text_2']",
+              "item/end": "@triggerBody()?['text_3']",
+              "item/timeZone": "(UTC-05:00) Eastern Time (US & Canada)",
+              "item/body": "@triggerBody()?['text_1']",
+              "item/location": "@triggerBody()?['text_4']",
+              "item/reminderMinutesBeforeStart": 60
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Respond_to_a_PowerApp_or_flow": {
+          "runAfter": {
+            "Create_event_(V4)": [
+              "Succeeded"
+            ]
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "ok"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

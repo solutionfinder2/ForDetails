@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<environmentvariabledefinition schemaname="wsr_SharePointSiteUrl">
+  <displayname default="SharePoint Site URL" />
+  <description default="Full URL of the SharePoint site that hosts the EventSessionRegistration_* lists, e.g. https://contoso.sharepoint.com/sites/YourSite" />
+  <isrequired>1</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

@@ -1,0 +1,114 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "impersonation": {},
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "wsr_sharedsharepointonline"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_office365": {
+        "impersonation": {},
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "wsr_sharedoffice365"
+        },
+        "api": {
+          "name": "shared_office365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "SharePoint Site URL (wsr_SharePointSiteUrl)": {
+          "defaultValue": "",
+          "type": "String",
+          "metadata": {
+            "schemaName": "wsr_SharePointSiteUrl",
+            "description": "Full URL of the SharePoint site that hosts the EventSessionRegistration_* lists"
+          }
+        }
+      },
+      "triggers": {
+        "Recurrence": {
+          "type": "Recurrence",
+          "recurrence": {
+            "frequency": "Day",
+            "interval": 1,
+            "timeZone": "Eastern Standard Time",
+            "schedule": {
+              "hours": [
+                "7"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_tomorrows_registrations": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems"
+            },
+            "parameters": {
+              "dataset": "@parameters('SharePoint Site URL (wsr_SharePointSiteUrl)')",
+              "table": "EventSessionRegistration_Registrations",
+              "$filter": "Status eq 'Confirmed' and SessionDate ge '@{formatDateTime(addDays(utcNow(), 1), 'yyyy-MM-dd')}' and SessionDate lt '@{formatDateTime(addDays(utcNow(), 2), 'yyyy-MM-dd')}'",
+              "$top": 500
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Apply_to_each_registration": {
+          "runAfter": {
+            "Get_tomorrows_registrations": [
+              "Succeeded"
+            ]
+          },
+          "type": "Foreach",
+          "foreach": "@outputs('Get_tomorrows_registrations')?['body/value']",
+          "actions": {
+            "Send_reminder_email": {
+              "runAfter": {},
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365",
+                  "connectionName": "shared_office365",
+                  "operationId": "SendEmailV2"
+                },
+                "parameters": {
+                  "emailMessage/To": "@items('Apply_to_each_registration')?['UserEmail']",
+                  "emailMessage/Subject": "Reminder: @{coalesce(items('Apply_to_each_registration')?['EventName'], 'your session')} tomorrow - @{coalesce(items('Apply_to_each_registration')?['TimeSlot'], '')}",
+                  "emailMessage/Body": "<div style='margin:0;padding:24px;background-color:#F6F7FB;font-family:Segoe UI,Arial,sans-serif;'><div style='max-width:600px;margin:0 auto;background-color:#FFFFFF;border:1px solid #E4E7EF;border-radius:12px;overflow:hidden;'><div style='background-color:#373F4B;padding:20px 28px;'><span style='color:#FFFFFF;font-size:18px;font-weight:bold;'>Weekly Session Registration</span></div><div style='padding:28px;color:#28303F;font-size:14px;line-height:1.6;'>Hi @{coalesce(items('Apply_to_each_registration')?['UserName'], 'there')},<br><br>This is a reminder that you are registered for a session <b>tomorrow</b>.<br><br>Event: @{coalesce(items('Apply_to_each_registration')?['EventName'], '&mdash;')}<br>Date: @{formatDateTime(items('Apply_to_each_registration')?['SessionDate'], 'dddd, MMMM d, yyyy')}<br>Time: @{coalesce(items('Apply_to_each_registration')?['TimeSlot'], '')}<br>Reference: WSR-@{items('Apply_to_each_registration')?['ID']}<br><br>If you can no longer attend, please cancel or switch your registration in the app so the seat opens up for someone else.</div><div style='padding:16px 28px;background-color:#F6F7FB;border-top:1px solid #E4E7EF;color:#68738A;font-size:12px;'>This is an automated message from the Weekly Session Registration app. Please do not reply.</div></div></div>",
+                  "emailMessage/Importance": "Normal"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}
