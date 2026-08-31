@@ -51,6 +51,8 @@ Two options, both in `App/OnStart.txt` (see the comments there):
    **Solutions → Import solution** (not My flows → Import). All emails are
    sent in the branded HTML shell; this build's reminder flow has its text
    hardcoded, so nothing references the EmailTemplates list.
+   **Prefer building by hand?** Follow the step-by-step guide in
+   `Flow/MANUAL-FLOWS.md`.
 3. In Power Apps Studio, add the data sources: the four lists plus the
    flows (`EventSessionRegistration_SendAppEmail`, `_ExportCSV`,
    `_AddToCalendar`, `_SendReportEmail`, `_ShareEvent`) and the Office 365
