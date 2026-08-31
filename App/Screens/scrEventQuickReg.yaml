@@ -1917,6 +1917,24 @@ Screens:
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   OnSelect: =Set(varShowCancelEvQ, false)
+            # -----------------------------------------------------------------
+            # BACKUP - trigger the cancel email WITHOUT the EmailTemplates list.
+            # In the OnSelect below, replace the whole With({tpl: ...}) block
+            # (everything from "With({tpl:" through its closing ")));") with:
+            #
+            #   If(IsError(
+            #       EventSessionRegistration_SendAppEmail.Run(
+            #           varCancelTarget.UserEmail,
+            #           "Registration Cancelled - " & Coalesce(varCancelTarget.EventName, "Session") &
+            #               " (WSR-" & Text(varCancelTarget.ID) & ")",
+            #           "Hi " & varCancelTarget.UserName & "," & Char(10) & Char(10) &
+            #           "Your registration has been cancelled." & Char(10) & Char(10) &
+            #           "Event: " & Coalesce(varCancelTarget.EventName, "—") & Char(10) &
+            #           "Date: " & Text(varCancelTarget.SessionDate, "dddd, mmmm d, yyyy") & Char(10) &
+            #           "Time: " & varCancelTarget.TimeSlot & Char(10) &
+            #           "Reference: WSR-" & Text(varCancelTarget.ID))),
+            #       Notify("Cancelled, but the notification email could not be sent.", NotificationType.Warning));
+            # -----------------------------------------------------------------
             - btnCancelEvQConfirm:
                 Control: ModernButton@1.0.0
                 Properties:
@@ -2264,6 +2282,28 @@ Screens:
                   RadiusBottomLeft: =8
                   RadiusBottomRight: =8
                   OnSelect: =Set(varShowRegModal_EvQ, false)
+            # -----------------------------------------------------------------
+            # BACKUP - confirmation/switch email WITHOUT the EmailTemplates
+            # list. In the OnSelect below, replace the whole With({tplKey: ...})
+            # block (through its closing "))));") with:
+            #
+            #   If(IsError(
+            #       EventSessionRegistration_SendAppEmail.Run(
+            #           varNewReg.UserEmail,
+            #           If(varWasSwitch, "Session Switched - ", "Registration Confirmed - ") &
+            #               Coalesce(varNewReg.EventName, "Session") & " (WSR-" & Text(varNewReg.ID) & ")",
+            #           "Hi " & varNewReg.UserName & "," & Char(10) & Char(10) &
+            #           If(varWasSwitch,
+            #               "Your registration has been moved to the session below.",
+            #               "Your registration is confirmed.") & Char(10) & Char(10) &
+            #           "Event: " & Coalesce(varNewReg.EventName, "—") & Char(10) &
+            #           "Date: " & Text(varNewReg.SessionDate, "dddd, mmmm d, yyyy") & Char(10) &
+            #           "Time: " & varNewReg.TimeSlot & Char(10) &
+            #           "Reference: WSR-" & Text(varNewReg.ID) &
+            #           If(IsBlank(varEventDetail.MeetingLink), "",
+            #               Char(10) & "Meeting link: " & varEventDetail.MeetingLink))),
+            #       Notify("Registered, but the confirmation email could not be sent.", NotificationType.Warning));
+            # -----------------------------------------------------------------
             - btnRegModalConfirm_EvQ:
                 Control: ModernButton@1.0.0
                 Properties:

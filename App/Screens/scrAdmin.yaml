@@ -3281,6 +3281,24 @@ Screens:
                                     VerticalAlign: =VerticalAlign.Middle
                                     Color: =If(ThisItem.Status = "Confirmed", RGBA(38, 124, 87, 1), RGBA(140, 88, 42, 1))
                                     Fill: =If(ThisItem.Status = "Confirmed", RGBA(226, 244, 235, 1), RGBA(250, 237, 224, 1))
+                              # -------------------------------------------------
+                              # BACKUP - cancel email WITHOUT the EmailTemplates
+                              # list. In the OnSelect below, replace the whole
+                              # With({tpl: ...}) block (through its ")));") with:
+                              #
+                              #   If(IsError(
+                              #       EventSessionRegistration_SendAppEmail.Run(
+                              #           ThisItem.UserEmail,
+                              #           "Registration Cancelled - " & Coalesce(ThisItem.EventName, "Session") &
+                              #               " (WSR-" & Text(ThisItem.ID) & ")",
+                              #           "Hi " & ThisItem.UserName & "," & Char(10) & Char(10) &
+                              #           "Your registration has been cancelled by an administrator." & Char(10) & Char(10) &
+                              #           "Event: " & Coalesce(ThisItem.EventName, "—") & Char(10) &
+                              #           "Date: " & Text(ThisItem.SessionDate, "dddd, mmmm d, yyyy") & Char(10) &
+                              #           "Time: " & ThisItem.TimeSlot & Char(10) &
+                              #           "Reference: WSR-" & Text(ThisItem.ID))),
+                              #       Notify("Cancelled, but the notification email could not be sent.", NotificationType.Warning));
+                              # -------------------------------------------------
                               - btnRRowCancel:
                                   Control: ModernButton@1.0.0
                                   Properties:
