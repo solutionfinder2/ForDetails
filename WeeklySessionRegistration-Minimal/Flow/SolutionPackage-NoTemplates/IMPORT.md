@@ -1,6 +1,6 @@
 # Flow solution for the MINIMAL edition
 
-`EventSessionRegistrationFlows_NoTemplates_1_0_0_8.zip` (one folder up) is
+`EventSessionRegistrationFlows_NoTemplates_1_0_0_9.zip` (one folder up) is
 the flow package that pairs with the minimal app. It contains all six
 flows, is tenant-neutral, and has **no EmailTemplates list dependency** -
 which matches this edition, where the app sends emails with hardcoded
@@ -28,18 +28,32 @@ shell lives in each flow's "Send an email (V2)" action body.
 
 ## Import steps
 
-1. Power Automate (make.powerautomate.com) > pick the target environment >
-   **Solutions** > **Import solution** > select the zip.
-2. Map the three connections when prompted (SharePoint, Outlook,
-   Office 365 Users) - create them if they don't exist yet.
+1. Open **Power Apps** or **Power Automate** → pick the target environment →
+   **Solutions** → **Import solution** → select
+   `EventSessionRegistrationFlows_NoTemplates_1_0_0_9.zip`.
+   - Do **not** use **My flows → Import** (legacy package). That path
+     expects a different zip format and will fail on this file.
+2. Map the three connections when prompted:
+   - **WSR SharePoint** → a SharePoint connection
+   - **WSR Office 365 Outlook** → an Outlook connection
+   - **WSR OneDrive for Business** → a OneDrive connection
+   Create any missing connection first, then finish the mapping.
 3. Enter the **SharePoint Site URL** environment variable value: the full
    URL of the site that hosts the `EventSessionRegistration_*` lists,
    e.g. `https://yourtenant.sharepoint.com/sites/YourSite`.
 4. After import, open the solution and turn every flow **On**.
 5. In the app, remove/re-add the flows if Studio flags stale references.
 
-> This is the same package as the full project's NoTemplates build - same
-> solution unique name and flow IDs. Import only one flow package per
-> environment; importing this over an existing install replaces the flows
-> in place (if Dataverse rejects a same-version import, bump `<Version>`
-> in `solution.xml` and re-zip).
+## Troubleshooting import errors
+
+| Symptom | Fix |
+|---|---|
+| Import rejected / "same or older version" | This package is **1.0.0.9**. It upgrades an existing `EventSessionRegistrationFlows` install (including the Universal 1.0.0.8 package). If you still hit a version block, delete the old solution (keep customizations if offered) or bump `<Version>` in `solution.xml` and re-zip. |
+| "Invalid package" / missing manifest | You used **My flows → Import**. Use **Solutions → Import solution** instead. |
+| Connection mapping step fails | Create SharePoint, Outlook, and OneDrive connections in the environment first, then re-run import. |
+| Flows import but stay Off | Open the solution → select each flow → **Turn on**. |
+
+> Same solution unique name (`EventSessionRegistrationFlows`) and flow IDs
+> as the Universal package. Import **only one** of these flow packages per
+> environment; NoTemplates replaces Universal in place when the version is
+> higher.

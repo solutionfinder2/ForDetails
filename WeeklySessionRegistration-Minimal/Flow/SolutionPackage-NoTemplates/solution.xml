@@ -3,12 +3,12 @@
   <SolutionManifest>
     <UniqueName>EventSessionRegistrationFlows</UniqueName>
     <LocalizedNames>
-      <LocalizedName description="Event Session Registration Flows" languagecode="1033" />
+      <LocalizedName description="Event Session Registration Flows (No Templates)" languagecode="1033" />
     </LocalizedNames>
     <Descriptions>
-      <Description description="Power Automate flows for the Weekly Session Registration canvas app: SendAppEmail, ExportCSV, AddToCalendar, SessionReminderDaily, SendReportEmail, ShareEvent. BACKUP build: tenant-neutral (site URL via environment variable) and no EmailTemplates list dependency - the daily reminder email text is hardcoded in the flow." languagecode="1033" />
+      <Description description="Power Automate flows for the Weekly Session Registration canvas app (minimal / no-EmailTemplates edition): SendAppEmail, ExportCSV, AddToCalendar, SessionReminderDaily, SendReportEmail, ShareEvent. Tenant-neutral site URL via environment variable; daily reminder text is hardcoded (no EmailTemplates list)." languagecode="1033" />
     </Descriptions>
-    <Version>1.0.0.8</Version>
+    <Version>1.0.0.9</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>wsrpublisher</UniqueName>
@@ -88,7 +88,10 @@
       <RootComponent type="29" id="{3f2504e0-4f89-41d3-9a0c-0305e82c3304}" behavior="0" />
       <RootComponent type="29" id="{3f2504e0-4f89-41d3-9a0c-0305e82c3305}" behavior="0" />
       <RootComponent type="29" id="{3f2504e0-4f89-41d3-9a0c-0305e82c3306}" behavior="0" />
-      <RootComponent type="380" schemaName="wsr_SharePointSiteUrl" behavior="0" />
+      <RootComponent type="environmentvariabledefinition" schemaName="wsr_SharePointSiteUrl" behavior="0" />
+      <RootComponent type="connectionreference" schemaName="wsr_sharedoffice365" behavior="0" />
+      <RootComponent type="connectionreference" schemaName="wsr_sharedonedriveforbusiness" behavior="0" />
+      <RootComponent type="connectionreference" schemaName="wsr_sharedsharepointonline" behavior="0" />
     </RootComponents>
     <MissingDependencies />
   </SolutionManifest>
