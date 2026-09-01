@@ -11,7 +11,7 @@ an admin console - nothing else.
 | Screens | 11 | **3** - `scrIntro`, `scrEventQuickReg`, `scrAdmin` |
 | SharePoint lists | 5 | **4** - Events, SessionTimeSlots, Registrations, AppRoles (**no EmailTemplates**) |
 | Emails | Templates from the EmailTemplates list | **Hardcoded** in the screens (register / switch / cancel) |
-| Flow package | Standard or Universal | **NoTemplates packages** in `Flow/Packages/` (Import Package Legacy) |
+| Flow package | Standard or Universal | **NoTemplates** - included here in `Flow/` |
 | Promote an event | Settings screen | **Backend** - IsPromoted column or an ID in OnStart (see below) |
 
 ## User journey
@@ -46,12 +46,10 @@ Two options, both in `App/OnStart.txt` (see the comments there):
 1. Create the four lists (use the full project's
    `SharePoint/CreateLists.ps1` or the manual guide in `DEPLOYMENT.md` -
    simply skip the EmailTemplates list).
-2. Import the six Power Automate packages from `Flow/Packages/`
-   (see `Flow/Packages/IMPORT.md`). Use
-   **My flows → Import → Import Package (Legacy)** — not Solutions import.
-   All emails use the branded HTML shell; the reminder flow text is
-   hardcoded (no EmailTemplates list).
-   Prefer building by hand? See `Flow/MANUAL-FLOWS.md`.
+2. Import `Flow/EventSessionRegistrationFlows_NoTemplates_1_0_0_9.zip`
+   (see `Flow/SolutionPackage-NoTemplates/IMPORT.md`). All emails are sent
+   in the branded HTML shell; this build's reminder flow has its text
+   hardcoded, so nothing references the EmailTemplates list.
 3. In Power Apps Studio, add the data sources: the four lists plus the
    flows (`EventSessionRegistration_SendAppEmail`, `_ExportCSV`,
    `_AddToCalendar`, `_SendReportEmail`, `_ShareEvent`) and the Office 365

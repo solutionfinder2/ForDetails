@@ -167,7 +167,6 @@
       <connectionreferencedisplayname>WSR Office 365 Outlook</connectionreferencedisplayname>
       <connectorid>/providers/Microsoft.PowerApps/apis/shared_office365</connectorid>
       <iscustomizable>1</iscustomizable>
-      <promptingbehavior>0</promptingbehavior>
       <statecode>0</statecode>
       <statuscode>1</statuscode>
       <description>Office 365 Outlook connection for Weekly Session Registration flows</description>
@@ -176,7 +175,6 @@
       <connectionreferencedisplayname>WSR OneDrive for Business</connectionreferencedisplayname>
       <connectorid>/providers/Microsoft.PowerApps/apis/shared_onedriveforbusiness</connectorid>
       <iscustomizable>1</iscustomizable>
-      <promptingbehavior>0</promptingbehavior>
       <statecode>0</statecode>
       <statuscode>1</statuscode>
       <description>OneDrive connection for the ExportCSV flow</description>
@@ -185,12 +183,28 @@
       <connectionreferencedisplayname>WSR SharePoint</connectionreferencedisplayname>
       <connectorid>/providers/Microsoft.PowerApps/apis/shared_sharepointonline</connectorid>
       <iscustomizable>1</iscustomizable>
-      <promptingbehavior>0</promptingbehavior>
       <statecode>0</statecode>
       <statuscode>1</statuscode>
       <description>SharePoint connection for the SessionReminderDaily flow</description>
     </connectionreference>
   </connectionreferences>
+  <EnvironmentVariables>
+    <Definition IntroducedVersion="1.0.0.0">
+      <Name>wsr_SharePointSiteUrl</Name>
+      <IsRequired>1</IsRequired>
+      <Type>100000000</Type>
+      <DisplayName>
+        <LocalizedNames>
+          <LocalizedName description="SharePoint Site URL" languagecode="1033" />
+        </LocalizedNames>
+      </DisplayName>
+      <Description>
+        <LocalizedNames>
+          <LocalizedName description="Full URL of the SharePoint site that hosts the EventSessionRegistration_* lists, e.g. https://contoso.sharepoint.com/sites/YourSite" languagecode="1033" />
+        </LocalizedNames>
+      </Description>
+    </Definition>
+  </EnvironmentVariables>
   <Languages>
     <Language>1033</Language>
   </Languages>
