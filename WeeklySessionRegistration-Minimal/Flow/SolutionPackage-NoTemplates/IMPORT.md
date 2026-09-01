@@ -1,6 +1,6 @@
 # Flow solution for the MINIMAL edition
 
-`EventSessionRegistrationFlows_NoTemplates_1_0_0_10.zip` (one folder up) is
+`EventSessionRegistrationFlows_NoTemplates_1_0_0_11.zip` (one folder up) is
 the flow package that pairs with the minimal app. It contains all six
 flows, is tenant-neutral, and has **no EmailTemplates list dependency** -
 which matches this edition, where the app sends emails with hardcoded
@@ -13,12 +13,12 @@ Every email the solution sends is wrapped in the branded HTML shell
 
 | Flow | Email it sends | Where the text comes from |
 |---|---|---|
-| `EventSessionRegistration_SendAppEmail` | Register / switch / cancel notifications | The app passes plain text; the flow converts line breaks and wraps it in the HTML shell |
-| `EventSessionRegistration_SessionReminderDaily` | Day-before reminder (7 AM ET) | Hardcoded inside the flow, already in the HTML shell |
-| `EventSessionRegistration_ShareEvent` | "Someone shared an event with you" | Built inside the flow, in the HTML shell |
-| `EventSessionRegistration_SendReportEmail` | Registration report with CSV attachment | Built inside the flow, in the HTML shell |
-| `EventSessionRegistration_ExportCSV` | (no email - returns the CSV to the app) | - |
-| `EventSessionRegistration_AddToCalendar` | (no email - creates an Outlook event) | - |
+| `EventSession_SendAppEmail` | Register / switch / cancel notifications (+ a Teams adaptive card to the same person) | The app passes plain text; the flow converts line breaks and wraps it in the HTML shell / card |
+| `EventSession_SessionReminderDaily` | Day-before reminder (7 AM ET) (+ a Teams adaptive card) | Hardcoded inside the flow, already in the HTML shell |
+| `EventSession_ShareEvent` | "Someone shared an event with you" | Built inside the flow, in the HTML shell |
+| `EventSession_SendReportEmail` | Registration report with CSV attachment | Built inside the flow, in the HTML shell |
+| `EventSession_ExportCSV` | (no email - returns the CSV to the app) | - |
+| `EventSession_AddToCalendar` | (no email - creates an Outlook event) | - |
 
 To change email wording in this edition: app-triggered text lives in the
 screens (`btnRegModalConfirm_EvQ`, `btnCancelEvQConfirm` in
@@ -30,9 +30,12 @@ shell lives in each flow's "Send an email (V2)" action body.
 
 1. Power Automate (make.powerautomate.com) > pick the target environment >
    **Solutions** > **Import solution** > select the zip.
-2. Map the three connections when prompted (SharePoint, Outlook,
-   Office 365 Users) - create them if they don't exist yet.
-3. After import, open **EventSessionRegistration_SessionReminderDaily** >
+2. Map the four connections when prompted (SharePoint, Outlook, OneDrive
+   for Business, Microsoft Teams) - create them if they don't exist yet.
+   The Teams connection posts the adaptive card notifications (via the
+   Flow bot) that go out alongside the emails; if a recipient has no
+   Teams, the card step fails quietly and the flow still succeeds.
+3. After import, open **EventSession_SessionReminderDaily** >
    **Edit**, open the **Get items** step, and set **Site Address** to the
    site that hosts the `EventSessionRegistration_*` lists (it ships with a
    `https://yourtenant.sharepoint.com/...` placeholder). Re-pick the

@@ -8,7 +8,7 @@
 #   - Success shows a Confirmation modal.
 # Validation: capacity re-check, duplicate/clash check, MaxPerUser limit,
 # registration cutoff (waived for switches). Confirmation, switch, and
-# cancel emails are sent via EventSessionRegistration_SendAppEmail with
+# cancel emails are sent via EventSession_SendAppEmail with
 # HARDCODED subject/body - the EmailTemplates list is NOT used in this
 # edition (pair it with the NoTemplates flow package).
 # Navigate here with:
@@ -440,7 +440,7 @@ Screens:
                                                 With({startDT: ThisItem.SessionDate + IfError(TimeValue(First(p).Value), Time(9, 0, 0)),
                                                       endDT: ThisItem.SessionDate + IfError(TimeValue(Last(p).Value), Time(15, 0, 0))},
                                                     If(IsError(
-                                                        EventSessionRegistration_AddToCalendar.Run(
+                                                        EventSession_AddToCalendar.Run(
                                                             Coalesce(ThisItem.EventName, "Session") & " - " & ThisItem.TimeSlot,
                                                             "Your registered session." & Char(10) &
                                                                 "Event: " & Coalesce(ThisItem.EventName, "") & Char(10) &
@@ -450,7 +450,7 @@ Screens:
                                                             Text(startDT, "yyyy-mm-ddThh:mm:ss"),
                                                             Text(endDT, "yyyy-mm-ddThh:mm:ss"),
                                                             loc)),
-                                                        Notify("Could not add to your calendar. Check that the EventSessionRegistration_AddToCalendar flow is connected.", NotificationType.Error),
+                                                        Notify("Could not add to your calendar. Check that the EventSession_AddToCalendar flow is connected.", NotificationType.Error),
                                                         Notify("Added to your Outlook calendar.", NotificationType.Success))))
                         # Sessions card
                         - conSessions_EvQ:
@@ -1780,13 +1780,13 @@ Screens:
                         IsBlank(varAppURL),
                         Notify("No app link configured - set varAppURL in App.OnStart to the app's web link first.", NotificationType.Warning),
                         With({link: varAppURL & If(IsBlank(Find("?", varAppURL)), "?", "&") & "eventid=" & varDetailEventID},
-                            If(IsError(EventSessionRegistration_ShareEvent.Run(
+                            If(IsError(EventSession_ShareEvent.Run(
                                     Concat(colShareEvQTo, Mail, ";"),
                                     Trim(txtShareEvQSubject.Text),
                                     txtShareEvQBody.Text,
                                     varEventDetail.Title,
                                     link)),
-                                Notify("Could not send. Check that the EventSessionRegistration_ShareEvent flow is connected and turned on.", NotificationType.Error),
+                                Notify("Could not send. Check that the EventSession_ShareEvent flow is connected and turned on.", NotificationType.Error),
                                 Set(varShowShareEvQ, false);
                                 Notify("Event shared with " & Concat(colShareEvQTo, DisplayName, ", "), NotificationType.Success))))
             # Suggestion dropdown - declared last so it renders on top of the fields below it
@@ -1940,7 +1940,7 @@ Screens:
                         LookUp(EventSessionRegistration_Registrations, ID = varCancelTarget.ID),
                         {Status: "Cancelled"});
                     If(IsError(
-                        EventSessionRegistration_SendAppEmail.Run(
+                        EventSession_SendAppEmail.Run(
                             varCancelTarget.UserEmail,
                             "Registration Cancelled - " & Coalesce(varCancelTarget.EventName, "Session") & " (WSR-" & Text(varCancelTarget.ID) & ")",
                             "Hi " & varCancelTarget.UserName & "," & Char(10) & Char(10) &
@@ -2319,7 +2319,7 @@ Screens:
                         Set(varWasSwitch, Coalesce(varEvqSwitchRegID, 0) > 0);
                         With({link: Coalesce(varEventDetail.MeetingLink, "")},
                             If(IsError(
-                                EventSessionRegistration_SendAppEmail.Run(
+                                EventSession_SendAppEmail.Run(
                                     varNewReg.UserEmail,
                                     If(varWasSwitch, "Session Switched - ", "Registration Confirmed - ") &
                                         Coalesce(varNewReg.EventName, "Session") & " (WSR-" & Text(varNewReg.ID) & ")",

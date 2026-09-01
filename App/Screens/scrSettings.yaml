@@ -11,7 +11,7 @@
 # session switched, registration cancelled, session reminder).
 # Admins edit the subject/body; placeholders like {UserName} are
 # replaced with real values at send time. The actual sending happens
-# through the EventSessionRegistration_SendAppEmail flow (see Flow/SendAppEmail-Flow.md).
+# through the EventSession_SendAppEmail flow (see Flow/SendAppEmail-Flow.md).
 #
 # User Roles tab: manages the EventSessionRegistration_AppRoles SharePoint list
 # (who is an Admin or Coordinator). Add by email; remove with a

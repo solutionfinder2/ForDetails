@@ -10,6 +10,16 @@
         "api": {
           "name": "shared_office365"
         }
+      },
+      "shared_teams": {
+        "impersonation": {},
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "wsr_sharedteams"
+        },
+        "api": {
+          "name": "shared_teams"
+        }
       }
     },
     "definition": {
@@ -85,7 +95,7 @@
         },
         "Respond_to_a_PowerApp_or_flow": {
           "runAfter": {
-            "Send_an_email_(V2)": [
+            "Teams_card_optional": [
               "Succeeded"
             ]
           },
@@ -107,6 +117,40 @@
               }
             }
           }
+        },
+        "Post_adaptive_card_in_Teams": {
+          "runAfter": {
+            "Send_an_email_(V2)": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams",
+              "connectionName": "shared_teams",
+              "operationId": "PostCardToConversation"
+            },
+            "parameters": {
+              "poster": "Flow bot",
+              "location": "Chat with Flow bot",
+              "body/recipient": "@triggerBody()?['text']",
+              "body/messageBody": "{\"type\": \"AdaptiveCard\", \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\", \"version\": \"1.4\", \"body\": [{\"type\": \"TextBlock\", \"text\": \"Weekly Session Registration\", \"weight\": \"Bolder\", \"color\": \"Accent\", \"size\": \"Small\"}, {\"type\": \"TextBlock\", \"text\": \"@{replace(triggerBody()?['text_1'], '\\\"', '\\\\\\\"')}\", \"weight\": \"Bolder\", \"size\": \"Medium\", \"wrap\": true}, {\"type\": \"TextBlock\", \"text\": \"@{replace(replace(triggerBody()?['text_2'], '\\\"', '\\\\\\\"'), decodeUriComponent('%0A'), '\\\\n')}\", \"wrap\": true, \"spacing\": \"Medium\"}]}"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Teams_card_optional": {
+          "runAfter": {
+            "Post_adaptive_card_in_Teams": [
+              "Succeeded",
+              "Failed",
+              "Skipped",
+              "TimedOut"
+            ]
+          },
+          "type": "Compose",
+          "inputs": "Teams card attempted - a failure here (e.g. recipient has no Teams) does not fail the flow"
         }
       }
     },

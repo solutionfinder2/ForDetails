@@ -46,12 +46,12 @@ Two options, both in `App/OnStart.txt` (see the comments there):
 1. Create the four lists (use the full project's
    `SharePoint/CreateLists.ps1` or the manual guide in `DEPLOYMENT.md` -
    simply skip the EmailTemplates list).
-2. Import `Flow/EventSessionRegistrationFlows_NoTemplates_1_0_0_10.zip`
+2. Import `Flow/EventSessionRegistrationFlows_NoTemplates_1_0_0_11.zip`
    (see `Flow/SolutionPackage-NoTemplates/IMPORT.md`). All emails are sent
    in the branded HTML shell; this build's reminder flow has its text
    hardcoded, so nothing references the EmailTemplates list.
 3. In Power Apps Studio, add the data sources: the four lists plus the
-   flows (`EventSessionRegistration_SendAppEmail`, `_ExportCSV`,
+   flows (`EventSession_SendAppEmail`, `_ExportCSV`,
    `_AddToCalendar`, `_SendReportEmail`, `_ShareEvent`) and the Office 365
    Users / Groups connectors (used by the Admin event form and Share).
 4. Paste `App/OnStart.txt` into App.OnStart, set
@@ -65,7 +65,7 @@ Two options, both in `App/OnStart.txt` (see the comments there):
 ## Emails in this edition
 
 Register, switch, and cancel emails are sent through
-`EventSessionRegistration_SendAppEmail` with subject/body built directly
+`EventSession_SendAppEmail` with subject/body built directly
 in Power Fx (branded HTML shell is applied by the flow). To change the
 wording, edit the `OnSelect` of:
 
@@ -76,4 +76,4 @@ wording, edit the `OnSelect` of:
 | Cancelled (by admin) | `scrAdmin.yaml` | `btnRRowCancel` |
 
 The daily session reminder text lives inside the
-`EventSessionRegistration_SessionReminderDaily` flow (NoTemplates build).
+`EventSession_SessionReminderDaily` flow (NoTemplates build).

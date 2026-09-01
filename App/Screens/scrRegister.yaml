@@ -1966,7 +1966,7 @@ Screens:
                                     # (through its closing "))));") with:
                                     #
                                     #   If(IsError(
-                                    #       EventSessionRegistration_SendAppEmail.Run(
+                                    #       EventSession_SendAppEmail.Run(
                                     #           varNewReg.UserEmail,
                                     #           If(varWasSwitch, "Session Switched - ", "Registration Confirmed - ") &
                                     #               Coalesce(varNewReg.EventName, "Session") & " (WSR-" & Text(varNewReg.ID) & ")",
@@ -2061,7 +2061,7 @@ Screens:
                                                         Notify("Registered, but no confirmation email was sent - the '" & tplKey & "' template is missing from the EmailTemplates list.", NotificationType.Warning),
                                                         tpl.IsActive,
                                                         If(IsError(
-                                                            EventSessionRegistration_SendAppEmail.Run(
+                                                            EventSession_SendAppEmail.Run(
                                                                 varNewReg.UserEmail,
                                                                 Substitute(Substitute(Substitute(Substitute(Substitute(Substitute(tpl.Subject,
                                                                     "{UserName}", varNewReg.UserName),

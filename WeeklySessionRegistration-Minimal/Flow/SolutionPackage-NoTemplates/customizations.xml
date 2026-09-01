@@ -3,7 +3,7 @@
   <Entities />
   <Roles />
   <Workflows>
-    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3301}" Name="EventSessionRegistration_SendAppEmail">
+    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3301}" Name="EventSession_SendAppEmail">
       <JsonFileName>/Workflows/SendAppEmail-3F2504E0-4F89-41D3-9A0C-0305E82C3301.json</JsonFileName>
       <Type>1</Type>
       <Subprocess>0</Subprocess>
@@ -25,10 +25,10 @@
       <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
       <PrimaryEntity>none</PrimaryEntity>
       <LocalizedNames>
-        <LocalizedName description="EventSessionRegistration_SendAppEmail" languagecode="1033" />
+        <LocalizedName description="EventSession_SendAppEmail" languagecode="1033" />
       </LocalizedNames>
     </Workflow>
-    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3302}" Name="EventSessionRegistration_ExportCSV">
+    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3302}" Name="EventSession_ExportCSV">
       <JsonFileName>/Workflows/ExportCSV-3F2504E0-4F89-41D3-9A0C-0305E82C3302.json</JsonFileName>
       <Type>1</Type>
       <Subprocess>0</Subprocess>
@@ -50,10 +50,10 @@
       <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
       <PrimaryEntity>none</PrimaryEntity>
       <LocalizedNames>
-        <LocalizedName description="EventSessionRegistration_ExportCSV" languagecode="1033" />
+        <LocalizedName description="EventSession_ExportCSV" languagecode="1033" />
       </LocalizedNames>
     </Workflow>
-    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3303}" Name="EventSessionRegistration_AddToCalendar">
+    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3303}" Name="EventSession_AddToCalendar">
       <JsonFileName>/Workflows/AddToCalendar-3F2504E0-4F89-41D3-9A0C-0305E82C3303.json</JsonFileName>
       <Type>1</Type>
       <Subprocess>0</Subprocess>
@@ -75,10 +75,10 @@
       <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
       <PrimaryEntity>none</PrimaryEntity>
       <LocalizedNames>
-        <LocalizedName description="EventSessionRegistration_AddToCalendar" languagecode="1033" />
+        <LocalizedName description="EventSession_AddToCalendar" languagecode="1033" />
       </LocalizedNames>
     </Workflow>
-    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3305}" Name="EventSessionRegistration_SendReportEmail">
+    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3305}" Name="EventSession_SendReportEmail">
       <JsonFileName>/Workflows/SendReportEmail-3F2504E0-4F89-41D3-9A0C-0305E82C3305.json</JsonFileName>
       <Type>1</Type>
       <Subprocess>0</Subprocess>
@@ -100,10 +100,10 @@
       <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
       <PrimaryEntity>none</PrimaryEntity>
       <LocalizedNames>
-        <LocalizedName description="EventSessionRegistration_SendReportEmail" languagecode="1033" />
+        <LocalizedName description="EventSession_SendReportEmail" languagecode="1033" />
       </LocalizedNames>
     </Workflow>
-    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3306}" Name="EventSessionRegistration_ShareEvent">
+    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3306}" Name="EventSession_ShareEvent">
       <JsonFileName>/Workflows/ShareEvent-3F2504E0-4F89-41D3-9A0C-0305E82C3306.json</JsonFileName>
       <Type>1</Type>
       <Subprocess>0</Subprocess>
@@ -125,10 +125,10 @@
       <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
       <PrimaryEntity>none</PrimaryEntity>
       <LocalizedNames>
-        <LocalizedName description="EventSessionRegistration_ShareEvent" languagecode="1033" />
+        <LocalizedName description="EventSession_ShareEvent" languagecode="1033" />
       </LocalizedNames>
     </Workflow>
-    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3304}" Name="EventSessionRegistration_SessionReminderDaily">
+    <Workflow WorkflowId="{3f2504e0-4f89-41d3-9a0c-0305e82c3304}" Name="EventSession_SessionReminderDaily">
       <JsonFileName>/Workflows/SessionReminderDaily-3F2504E0-4F89-41D3-9A0C-0305E82C3304.json</JsonFileName>
       <Type>1</Type>
       <Subprocess>0</Subprocess>
@@ -150,7 +150,7 @@
       <IsCustomProcessingStepAllowedForOtherPublishers>1</IsCustomProcessingStepAllowedForOtherPublishers>
       <PrimaryEntity>none</PrimaryEntity>
       <LocalizedNames>
-        <LocalizedName description="EventSessionRegistration_SessionReminderDaily" languagecode="1033" />
+        <LocalizedName description="EventSession_SessionReminderDaily" languagecode="1033" />
       </LocalizedNames>
     </Workflow>
   </Workflows>
@@ -186,6 +186,14 @@
       <statecode>0</statecode>
       <statuscode>1</statuscode>
       <description>SharePoint connection for the SessionReminderDaily flow</description>
+    </connectionreference>
+    <connectionreference connectionreferencelogicalname="wsr_sharedteams">
+      <connectionreferencedisplayname>WSR Microsoft Teams</connectionreferencedisplayname>
+      <connectorid>/providers/Microsoft.PowerApps/apis/shared_teams</connectorid>
+      <iscustomizable>1</iscustomizable>
+      <statecode>0</statecode>
+      <statuscode>1</statuscode>
+      <description>Microsoft Teams connection for adaptive card notifications</description>
     </connectionreference>
   </connectionreferences>
   <Languages>

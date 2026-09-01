@@ -8,12 +8,12 @@ calls them by name.
 
 | # | Flow name | Trigger | Connectors |
 |---|---|---|---|
-| 1 | `EventSessionRegistration_SendAppEmail` | Power Apps (V2) | Office 365 Outlook |
-| 2 | `EventSessionRegistration_ExportCSV` | Power Apps (V2) | OneDrive for Business |
-| 3 | `EventSessionRegistration_AddToCalendar` | Power Apps (V2) | Office 365 Outlook |
-| 4 | `EventSessionRegistration_SendReportEmail` | Power Apps (V2) | Office 365 Outlook |
-| 5 | `EventSessionRegistration_ShareEvent` | Power Apps (V2) | Office 365 Outlook |
-| 6 | `EventSessionRegistration_SessionReminderDaily` | Recurrence | SharePoint + Outlook |
+| 1 | `EventSession_SendAppEmail` | Power Apps (V2) | Office 365 Outlook |
+| 2 | `EventSession_ExportCSV` | Power Apps (V2) | OneDrive for Business |
+| 3 | `EventSession_AddToCalendar` | Power Apps (V2) | Office 365 Outlook |
+| 4 | `EventSession_SendReportEmail` | Power Apps (V2) | Office 365 Outlook |
+| 5 | `EventSession_ShareEvent` | Power Apps (V2) | Office 365 Outlook |
+| 6 | `EventSession_SessionReminderDaily` | Recurrence | SharePoint + Outlook |
 
 **Prerequisites**
 
@@ -21,7 +21,13 @@ calls them by name.
    `_SessionTimeSlots`, `_Registrations`, `_AppRoles`
    (no `EmailTemplates` list for this edition).
 2. In Power Automate, create connections for **Office 365 Outlook**,
-   **SharePoint**, and **OneDrive for Business** under your account.
+   **SharePoint**, **OneDrive for Business**, and **Microsoft Teams**
+   under your account. (Teams is used by SendAppEmail and
+   SessionReminderDaily to post an adaptive card - via the Flow bot - to
+   the recipient alongside the email. If you build those flows manually
+   and want the cards, add a **Post card in a chat or channel** action
+   after the email step: Post as *Flow bot*, Post in *Chat with Flow bot*,
+   Recipient = the same email address the message goes to.)
 3. Create a OneDrive folder named **`CSV Exports`** in the root of the
    account that owns the OneDrive connection (ExportCSV writes there).
 
@@ -49,12 +55,12 @@ Replace `CONTENT_HERE` with the per-flow content noted below.
 
 ---
 
-## 1. `EventSessionRegistration_SendAppEmail`
+## 1. `EventSession_SendAppEmail`
 
 Used for register / switch / cancel emails from the app.
 
 1. Power Automate → **Create** → **Instant cloud flow**.
-2. Name: `EventSessionRegistration_SendAppEmail`.
+2. Name: `EventSession_SendAppEmail`.
 3. Trigger: **Power Apps (V2)** → Create.
 4. On the trigger, add three text inputs (**Add an input → Text**), all required:
 
@@ -107,12 +113,12 @@ message text goes.
 
 ---
 
-## 2. `EventSessionRegistration_ExportCSV`
+## 2. `EventSession_ExportCSV`
 
 Creates a CSV in OneDrive and returns a share link to the app.
 
 1. Create → Instant cloud flow → name
-   `EventSessionRegistration_ExportCSV` → trigger **Power Apps (V2)**.
+   `EventSession_ExportCSV` → trigger **Power Apps (V2)**.
 2. Trigger inputs (Text, required):
 
    | Title | Purpose |
@@ -152,12 +158,12 @@ Creates a CSV in OneDrive and returns a share link to the app.
 
 ---
 
-## 3. `EventSessionRegistration_AddToCalendar`
+## 3. `EventSession_AddToCalendar`
 
 Creates an event on the **signed-in user's** Outlook calendar.
 
 1. Instant cloud flow → name
-   `EventSessionRegistration_AddToCalendar` → **Power Apps (V2)**.
+   `EventSession_AddToCalendar` → **Power Apps (V2)**.
 2. Trigger inputs (Text, all required):
 
    | Title | Purpose |
@@ -201,12 +207,12 @@ Creates an event on the **signed-in user's** Outlook calendar.
 
 ---
 
-## 4. `EventSessionRegistration_SendReportEmail`
+## 4. `EventSession_SendReportEmail`
 
 Sends a report email with a CSV attachment (Admin screen).
 
 1. Instant cloud flow → name
-   `EventSessionRegistration_SendReportEmail` → **Power Apps (V2)**.
+   `EventSession_SendReportEmail` → **Power Apps (V2)**.
 2. Trigger inputs (Text, all required):
 
    | Title | Purpose |
@@ -243,12 +249,12 @@ Sends a report email with a CSV attachment (Admin screen).
 
 ---
 
-## 5. `EventSessionRegistration_ShareEvent`
+## 5. `EventSession_ShareEvent`
 
 Emails a share message with an “Open in the app” button.
 
 1. Instant cloud flow → name
-   `EventSessionRegistration_ShareEvent` → **Power Apps (V2)**.
+   `EventSession_ShareEvent` → **Power Apps (V2)**.
 2. Trigger inputs (Text, all required):
 
    | Title | Purpose |
@@ -279,14 +285,14 @@ Emails a share message with an “Open in the app” button.
 
 ---
 
-## 6. `EventSessionRegistration_SessionReminderDaily`
+## 6. `EventSession_SessionReminderDaily`
 
 Scheduled flow: every day at 7:00 AM Eastern, email everyone with a
 **Confirmed** registration for **tomorrow**. Reminder text is hardcoded
 (no EmailTemplates list).
 
 1. Create → **Scheduled cloud flow**.
-2. Name: `EventSessionRegistration_SessionReminderDaily`.
+2. Name: `EventSession_SessionReminderDaily`.
 3. Recurrence:
    - Frequency: **Day** / Interval: **1**
    - Time zone: **Eastern Time (US & Canada)** (or `Eastern Standard Time`)
@@ -353,11 +359,11 @@ Scheduled flow: every day at 7:00 AM Eastern, email everyone with a
 1. In Power Apps Studio, open the app → **Add data**.
 2. Add flows (search by name):
 
-   - `EventSessionRegistration_SendAppEmail`
-   - `EventSessionRegistration_ExportCSV`
-   - `EventSessionRegistration_AddToCalendar`
-   - `EventSessionRegistration_SendReportEmail`
-   - `EventSessionRegistration_ShareEvent`
+   - `EventSession_SendAppEmail`
+   - `EventSession_ExportCSV`
+   - `EventSession_AddToCalendar`
+   - `EventSession_SendReportEmail`
+   - `EventSession_ShareEvent`
 
    (`SessionReminderDaily` is schedule-only — do **not** add it to the app.)
 
@@ -392,7 +398,7 @@ After they work:
 
 1. Solutions → New solution → add the five Power Apps–triggered flows plus
    SessionReminderDaily.
-2. Add connection references for Outlook, SharePoint, and OneDrive.
+2. Add connection references for Outlook, SharePoint, OneDrive, and Teams.
 3. Export unmanaged for backup / other environments.
 
 For ready-made packages instead of manual build, import the zips in

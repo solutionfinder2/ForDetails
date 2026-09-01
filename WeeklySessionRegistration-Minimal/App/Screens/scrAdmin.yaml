@@ -998,7 +998,7 @@ Screens:
                                     OnSelect: |-
                                       =If(CountRows(galAdminRegs.AllItems) = 0,
                                           Notify("Nothing to export with the current filters.", NotificationType.Warning),
-                                          With({res: EventSessionRegistration_ExportCSV.Run(
+                                          With({res: EventSession_ExportCSV.Run(
                                                   "Registrations_" & Text(Now(), "yyyymmdd-hhmmss") & ".csv",
                                                   "Date,Time Slot,Event,Name,Email,Status" & Char(10) &
                                                   Concat(galAdminRegs.AllItems,
@@ -1009,7 +1009,7 @@ Screens:
                                                       UserEmail & "," & Status,
                                                       Char(10)))},
                                               If(IsBlank(res.fileurl),
-                                                  Notify("Export failed - check the EventSessionRegistration_ExportCSV flow run history.", NotificationType.Error),
+                                                  Notify("Export failed - check the EventSession_ExportCSV flow run history.", NotificationType.Error),
                                                   Download(res.fileurl & "?download=1"))))
                               - btnSendRegs:
                                   Control: ModernButton@1.0.0
@@ -1148,7 +1148,7 @@ Screens:
                                     OnSelect: |-
                                       =If(CountRows(galRptByEvent.AllItems) = 0,
                                           Notify("Nothing to export with the current filters.", NotificationType.Warning),
-                                          With({res: EventSessionRegistration_ExportCSV.Run(
+                                          With({res: EventSession_ExportCSV.Run(
                                                   "Report_ByEvent_" & Text(Now(), "yyyymmdd-hhmmss") & ".csv",
                                                   "Event,Registrations,Confirmed,Cancelled" & Char(10) &
                                                   Concat(galRptByEvent.AllItems,
@@ -1156,7 +1156,7 @@ Screens:
                                                       RegCount & "," & ConfCount & "," & CancCount,
                                                       Char(10)))},
                                               If(IsBlank(res.fileurl),
-                                                  Notify("Export failed - check the EventSessionRegistration_ExportCSV flow run history.", NotificationType.Error),
+                                                  Notify("Export failed - check the EventSession_ExportCSV flow run history.", NotificationType.Error),
                                                   Download(res.fileurl & "?download=1"))))
                               - btnSendRpt:
                                   Control: ModernButton@1.0.0
@@ -3083,7 +3083,7 @@ Screens:
                                     OnSelect: |-
                                       =Patch(EventSessionRegistration_Registrations, LookUp(EventSessionRegistration_Registrations, ID = ThisItem.ID), {Status: "Cancelled"});
                                       If(IsError(
-                                          EventSessionRegistration_SendAppEmail.Run(
+                                          EventSession_SendAppEmail.Run(
                                               ThisItem.UserEmail,
                                               "Registration Cancelled - " & Coalesce(ThisItem.EventName, "Session") & " (WSR-" & Text(ThisItem.ID) & ")",
                                               "Hi " & ThisItem.UserName & "," & Char(10) & Char(10) &
@@ -5241,13 +5241,13 @@ Screens:
                   OnSelect: |-
                     =If(CountRows(colSendRptTo) = 0,
                         Notify("Pick at least one recipient.", NotificationType.Warning),
-                        If(IsError(EventSessionRegistration_SendReportEmail.Run(
+                        If(IsError(EventSession_SendReportEmail.Run(
                                 Concat(colSendRptTo, Mail, ";"),
                                 Trim(txtSendRptSubject.Text),
                                 txtSendRptBody.Text,
                                 varSendRptFile,
                                 varSendRptCSV)),
-                            Notify("Could not send the report. Check that the EventSessionRegistration_SendReportEmail flow is connected and turned on.", NotificationType.Error),
+                            Notify("Could not send the report. Check that the EventSession_SendReportEmail flow is connected and turned on.", NotificationType.Error),
                             Set(varShowSendRpt, false);
                             Notify("Report sent to " & Concat(colSendRptTo, DisplayName, ", "), NotificationType.Success)))
             # Suggestion dropdown - declared last so it renders on top of the fields below it

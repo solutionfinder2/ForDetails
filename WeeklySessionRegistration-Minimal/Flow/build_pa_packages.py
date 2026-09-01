@@ -13,53 +13,52 @@ import uuid
 import zipfile
 from pathlib import Path
 
-SRC = Path(
-    "/workspace/WeeklySessionRegistration-Minimal/Flow/SolutionPackage-NoTemplates/Workflows"
-)
-OUT_DIR = Path("/workspace/WeeklySessionRegistration-Minimal/Flow/Packages")
-FLOW_COPY = Path("/workspace/Flow/Packages")
+# Paths are relative to this script's folder so the build works anywhere.
+_HERE = Path(__file__).resolve().parent
+SRC = _HERE / "SolutionPackage-NoTemplates" / "Workflows"
+OUT_DIR = _HERE / "Packages"
+FLOW_COPY = OUT_DIR
 
 # Stable GUIDs so re-builds stay consistent (folder / resource ids).
 FLOWS = [
     {
         "file": "SendAppEmail-3F2504E0-4F89-41D3-9A0C-0305E82C3301.json",
-        "name": "EventSessionRegistration_SendAppEmail",
+        "name": "EventSession_SendAppEmail",
         "package_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3301",
         "flow_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3301",
         "description": "Sends branded register/switch/cancel emails from the app.",
     },
     {
         "file": "ExportCSV-3F2504E0-4F89-41D3-9A0C-0305E82C3302.json",
-        "name": "EventSessionRegistration_ExportCSV",
+        "name": "EventSession_ExportCSV",
         "package_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3302",
         "flow_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3302",
         "description": "Writes a CSV to OneDrive and returns a share link.",
     },
     {
         "file": "AddToCalendar-3F2504E0-4F89-41D3-9A0C-0305E82C3303.json",
-        "name": "EventSessionRegistration_AddToCalendar",
+        "name": "EventSession_AddToCalendar",
         "package_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3303",
         "flow_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3303",
         "description": "Creates an Outlook calendar event for the signed-in user.",
     },
     {
         "file": "SessionReminderDaily-3F2504E0-4F89-41D3-9A0C-0305E82C3304.json",
-        "name": "EventSessionRegistration_SessionReminderDaily",
+        "name": "EventSession_SessionReminderDaily",
         "package_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3304",
         "flow_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3304",
         "description": "Daily 7 AM ET reminders for tomorrow's confirmed registrations.",
-        "replace_env_var": True,
     },
     {
         "file": "SendReportEmail-3F2504E0-4F89-41D3-9A0C-0305E82C3305.json",
-        "name": "EventSessionRegistration_SendReportEmail",
+        "name": "EventSession_SendReportEmail",
         "package_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3305",
         "flow_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3305",
         "description": "Emails a registration report with CSV attachment.",
     },
     {
         "file": "ShareEvent-3F2504E0-4F89-41D3-9A0C-0305E82C3306.json",
-        "name": "EventSessionRegistration_ShareEvent",
+        "name": "EventSession_ShareEvent",
         "package_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3306",
         "flow_guid": "3f2504e0-4f89-41d3-9a0c-0305e82c3306",
         "description": "Shares an event link by email.",
@@ -81,6 +80,11 @@ CONNECTOR_META = {
         "id": "/providers/Microsoft.PowerApps/apis/shared_onedriveforbusiness",
         "displayName": "OneDrive for Business",
         "apiName": "onedriveforbusiness",
+    },
+    "shared_teams": {
+        "id": "/providers/Microsoft.PowerApps/apis/shared_teams",
+        "displayName": "Microsoft Teams",
+        "apiName": "teams",
     },
 }
 

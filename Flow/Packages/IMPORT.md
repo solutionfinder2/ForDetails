@@ -9,12 +9,12 @@ type). Use the **Power Automate Package (Legacy)** zips in this folder instead.
 | File | Use |
 |---|---|
 | `EventSessionRegistrationFlows_NoTemplates_Packages.zip` | All six flow packages in one download (unzip first) |
-| `EventSessionRegistration_SendAppEmail.zip` | Single flow |
-| `EventSessionRegistration_ExportCSV.zip` | Single flow |
-| `EventSessionRegistration_AddToCalendar.zip` | Single flow |
-| `EventSessionRegistration_SendReportEmail.zip` | Single flow |
-| `EventSessionRegistration_ShareEvent.zip` | Single flow |
-| `EventSessionRegistration_SessionReminderDaily.zip` | Single flow (scheduled) |
+| `EventSession_SendAppEmail.zip` | Single flow |
+| `EventSession_ExportCSV.zip` | Single flow |
+| `EventSession_AddToCalendar.zip` | Single flow |
+| `EventSession_SendReportEmail.zip` | Single flow |
+| `EventSession_ShareEvent.zip` | Single flow |
+| `EventSession_SessionReminderDaily.zip` | Single flow (scheduled) |
 
 Also mirrored under `/Flow/Packages/` in the repo root.
 
@@ -23,7 +23,7 @@ Also mirrored under `/Flow/Packages/` in the repo root.
 1. Open [Power Automate](https://make.powerautomate.com) and select your environment.
 2. Go to **My flows** → **Import** → **Import Package (Legacy)**.
 3. **Upload** one of the flow `.zip` files from this folder
-   (for example `EventSessionRegistration_SendAppEmail.zip`).
+   (for example `EventSession_SendAppEmail.zip`).
 4. Under the flow row, set **Import setup** to **Create as new**.
 5. Under related resources (Outlook / SharePoint / OneDrive), open each row
    and select or create the matching **connection**, then **Save**.
@@ -43,11 +43,11 @@ Also mirrored under `/Flow/Packages/` in the repo root.
    List name stays `EventSessionRegistration_Registrations`.
 2. Create OneDrive folder **`/CSV Exports`** (used by ExportCSV).
 3. In Power Apps Studio, **Add data → Flows** and add:
-   - `EventSessionRegistration_SendAppEmail`
-   - `EventSessionRegistration_ExportCSV`
-   - `EventSessionRegistration_AddToCalendar`
-   - `EventSessionRegistration_SendReportEmail`
-   - `EventSessionRegistration_ShareEvent`  
+   - `EventSession_SendAppEmail`
+   - `EventSession_ExportCSV`
+   - `EventSession_AddToCalendar`
+   - `EventSession_SendReportEmail`
+   - `EventSession_ShareEvent`  
    (Do not add SessionReminderDaily to the app — it is schedule-only.)
 
 ## Prefer building in the designer?
