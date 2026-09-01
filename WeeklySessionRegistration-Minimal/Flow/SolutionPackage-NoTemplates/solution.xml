@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ImportExportXml version="9.2.0.0" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SolutionManifest>
-    <UniqueName>EventSessionRegistrationFlows</UniqueName>
+    <UniqueName>EventSessionFlows</UniqueName>
     <LocalizedNames>
-      <LocalizedName description="Event Session Registration Flows" languagecode="1033" />
+      <LocalizedName description="Event Session Flows" languagecode="1033" />
     </LocalizedNames>
     <Descriptions>
       <Description description="Power Automate flows for the Weekly Session Registration canvas app: SendAppEmail, ExportCSV, AddToCalendar, SessionReminderDaily, SendReportEmail, ShareEvent. BACKUP build: tenant-neutral and no EmailTemplates list dependency - the daily reminder email text is hardcoded in the flow; after import, open SessionReminderDaily and point its SharePoint action at your site." languagecode="1033" />

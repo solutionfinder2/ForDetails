@@ -46,7 +46,7 @@ Two options, both in `App/OnStart.txt` (see the comments there):
 1. Create the four lists (use the full project's
    `SharePoint/CreateLists.ps1` or the manual guide in `DEPLOYMENT.md` -
    simply skip the EmailTemplates list).
-2. Import `Flow/EventSessionRegistrationFlows_NoTemplates_1_0_0_12.zip`
+2. Import `Flow/EventSessionFlows_NoTemplates_1_0_0_12.zip`
    (see `Flow/SolutionPackage-NoTemplates/IMPORT.md`). All emails are sent
    in the branded HTML shell; this build's reminder flow has its text
    hardcoded, so nothing references the EmailTemplates list.

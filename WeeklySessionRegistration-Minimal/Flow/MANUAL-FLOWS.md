@@ -1,7 +1,7 @@
 # Manual flow build guide — Minimal edition (No Templates)
 
 Use this when you prefer to build the six Power Automate flows by hand
-instead of importing `EventSessionRegistrationFlows_NoTemplates_1_0_0_9.zip`.
+instead of importing `EventSessionFlows_NoTemplates_1_0_0_9.zip`.
 
 Flow **names must match exactly** (including underscores). The canvas app
 calls them by name.

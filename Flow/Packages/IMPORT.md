@@ -8,7 +8,7 @@ type). Use the **Power Automate Package (Legacy)** zips in this folder instead.
 
 | File | Use |
 |---|---|
-| `EventSessionRegistrationFlows_NoTemplates_Packages.zip` | All six flow packages in one download (unzip first) |
+| `EventSessionFlows_NoTemplates_Packages.zip` | All six flow packages in one download (unzip first) |
 | `EventSession_SendAppEmail.zip` | Single flow |
 | `EventSession_ExportCSV.zip` | Single flow |
 | `EventSession_AddToCalendar.zip` | Single flow |
@@ -32,7 +32,7 @@ Also mirrored under `/Flow/Packages/` in the repo root.
 8. Repeat for the other five packages.
 
 > Do **not** use **Solutions → Import solution** with these files.
-> Do **not** use the old `EventSessionRegistrationFlows_NoTemplates_*.zip`
+> Do **not** use the old `EventSessionFlows_NoTemplates_*.zip`
 > Dataverse solution package — that is the format that fails validation.
 
 ## After all six are imported

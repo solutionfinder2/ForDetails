@@ -1,6 +1,6 @@
 # Flow solution for the MINIMAL edition
 
-`EventSessionRegistrationFlows_NoTemplates_1_0_0_12.zip` (one folder up) is
+`EventSessionFlows_NoTemplates_1_0_0_12.zip` (one folder up) is
 the flow package that pairs with the minimal app. It contains all six
 flows, is tenant-neutral, and has **no EmailTemplates list dependency** -
 which matches this edition, where the app sends emails with hardcoded

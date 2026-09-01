@@ -372,7 +372,7 @@ def main() -> None:
         print(f"OK {path.name} ({path.stat().st_size} bytes)")
 
     # Combined archive of all six packages for easy download
-    combined = OUT_DIR / "EventSessionRegistrationFlows_NoTemplates_Packages.zip"
+    combined = OUT_DIR / "EventSessionFlows_NoTemplates_Packages.zip"
     if combined.exists():
         combined.unlink()
     with zipfile.ZipFile(combined, "w", compression=zipfile.ZIP_DEFLATED) as z:
