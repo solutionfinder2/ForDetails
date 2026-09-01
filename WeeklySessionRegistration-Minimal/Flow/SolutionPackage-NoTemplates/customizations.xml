@@ -188,23 +188,6 @@
       <description>SharePoint connection for the SessionReminderDaily flow</description>
     </connectionreference>
   </connectionreferences>
-  <EnvironmentVariables>
-    <Definition IntroducedVersion="1.0.0.0">
-      <Name>wsr_SharePointSiteUrl</Name>
-      <IsRequired>1</IsRequired>
-      <Type>100000000</Type>
-      <DisplayName>
-        <LocalizedNames>
-          <LocalizedName description="SharePoint Site URL" languagecode="1033" />
-        </LocalizedNames>
-      </DisplayName>
-      <Description>
-        <LocalizedNames>
-          <LocalizedName description="Full URL of the SharePoint site that hosts the EventSessionRegistration_* lists, e.g. https://contoso.sharepoint.com/sites/YourSite" languagecode="1033" />
-        </LocalizedNames>
-      </Description>
-    </Definition>
-  </EnvironmentVariables>
   <Languages>
     <Language>1033</Language>
   </Languages>

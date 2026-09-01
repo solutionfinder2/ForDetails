@@ -1,6 +1,6 @@
 # Flow solution for the MINIMAL edition
 
-`EventSessionRegistrationFlows_NoTemplates_1_0_0_9.zip` (one folder up) is
+`EventSessionRegistrationFlows_NoTemplates_1_0_0_10.zip` (one folder up) is
 the flow package that pairs with the minimal app. It contains all six
 flows, is tenant-neutral, and has **no EmailTemplates list dependency** -
 which matches this edition, where the app sends emails with hardcoded
@@ -32,11 +32,17 @@ shell lives in each flow's "Send an email (V2)" action body.
    **Solutions** > **Import solution** > select the zip.
 2. Map the three connections when prompted (SharePoint, Outlook,
    Office 365 Users) - create them if they don't exist yet.
-3. Enter the **SharePoint Site URL** environment variable value: the full
-   URL of the site that hosts the `EventSessionRegistration_*` lists,
-   e.g. `https://yourtenant.sharepoint.com/sites/YourSite`.
-4. After import, open the solution and turn every flow **On**.
+3. After import, open **EventSessionRegistration_SessionReminderDaily** >
+   **Edit**, open the **Get items** step, and set **Site Address** to the
+   site that hosts the `EventSessionRegistration_*` lists (it ships with a
+   `https://yourtenant.sharepoint.com/...` placeholder). Re-pick the
+   **List Name**, then Save. This is the only flow that needs it.
+4. Open the solution and turn every flow **On**.
 5. In the app, remove/re-add the flows if Studio flags stale references.
+
+> If the solution import itself fails in your environment (e.g. no
+> Dataverse database), use the **Package (Legacy)** zips in `../Packages/`
+> instead - see `../MANUAL-FLOWS.md`.
 
 > This is the same package as the full project's NoTemplates build - same
 > solution unique name and flow IDs. Import only one flow package per

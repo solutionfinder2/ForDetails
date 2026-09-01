@@ -33,14 +33,6 @@
         "$authentication": {
           "defaultValue": {},
           "type": "SecureObject"
-        },
-        "SharePoint Site URL (wsr_SharePointSiteUrl)": {
-          "defaultValue": "",
-          "type": "String",
-          "metadata": {
-            "schemaName": "wsr_SharePointSiteUrl",
-            "description": "Full URL of the SharePoint site that hosts the EventSessionRegistration_* lists"
-          }
         }
       },
       "triggers": {
@@ -69,7 +61,7 @@
               "operationId": "GetItems"
             },
             "parameters": {
-              "dataset": "@parameters('SharePoint Site URL (wsr_SharePointSiteUrl)')",
+              "dataset": "https://yourtenant.sharepoint.com/sites/YourSite",
               "table": "EventSessionRegistration_Registrations",
               "$filter": "Status eq 'Confirmed' and SessionDate ge '@{formatDateTime(addDays(utcNow(), 1), 'yyyy-MM-dd')}' and SessionDate lt '@{formatDateTime(addDays(utcNow(), 2), 'yyyy-MM-dd')}'",
               "$top": 500
