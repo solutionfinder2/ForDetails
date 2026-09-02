@@ -969,13 +969,18 @@ Screens:
                                       =If(CountRows(galAdminRegs.AllItems) = 0,
                                           Notify("Nothing to export with the current filters.", NotificationType.Warning),
                                           IfError(
-                                              Copy("Date" & Char(9) & "Time Slot" & Char(9) & "Event" & Char(9) & "Name" & Char(9) & "Email" & Char(9) & "Status" & Char(10) &
+                                              Copy("Date" & Char(9) & "Time Slot" & Char(9) & "Event" & Char(9) & "Name" & Char(9) & "Email" & Char(9) & "JobTitle" & Char(9) & "ExperienceLevel" & Char(9) & "AttendancePreference" & Char(9) & "OrgUnit" & Char(9) & "HeardFrom" & Char(9) & "Status" & Char(10) &
                                                   Concat(galAdminRegs.AllItems,
                                                       Text(SessionDate, "yyyy-mm-dd") & Char(9) &
                                                       TimeSlot & Char(9) &
                                                       Coalesce(EventName, "") & Char(9) &
                                                       UserName & Char(9) &
                                                       UserEmail & Char(9) &
+                                                      Coalesce(JobTitle, "") & Char(9) &
+                                                      Coalesce(ExperienceLevel.Value, "") & Char(9) &
+                                                      Coalesce(AttendancePreference.Value, "") & Char(9) &
+                                                      Coalesce(OrgUnit.Value, "") & Char(9) &
+                                                      Coalesce(HeardFrom.Value, "") & Char(9) &
                                                       Status,
                                                       Char(10))),
                                               Notify("Could not access the clipboard in this browser. Try running the app in a regular browser tab (not embedded in Teams or SharePoint).", NotificationType.Error),
@@ -1000,13 +1005,19 @@ Screens:
                                           Notify("Nothing to export with the current filters.", NotificationType.Warning),
                                           With({res: EventSession_ExportCSV.Run(
                                                   "Registrations_" & Text(Now(), "yyyymmdd-hhmmss") & ".csv",
-                                                  "Date,Time Slot,Event,Name,Email,Status" & Char(10) &
+                                                  "Date,Time Slot,Event,Name,Email,JobTitle,ExperienceLevel,AttendancePreference,OrgUnit,HeardFrom,Status" & Char(10) &
                                                   Concat(galAdminRegs.AllItems,
                                                       Text(SessionDate, "yyyy-mm-dd") & "," &
                                                       Substitute(TimeSlot, ",", " ") & "," &
                                                       Substitute(Coalesce(EventName, ""), ",", " ") & "," &
                                                       Substitute(UserName, ",", " ") & "," &
-                                                      UserEmail & "," & Status,
+                                                      UserEmail & "," &
+                                                      Substitute(Coalesce(JobTitle, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(ExperienceLevel.Value, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(AttendancePreference.Value, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(OrgUnit.Value, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(HeardFrom.Value, ""), ",", " ") & "," &
+                                                      Status,
                                                       Char(10)))},
                                               If(IsBlank(res.fileurl),
                                                   Notify("Export failed - check the EventSession_ExportCSV flow run history.", NotificationType.Error),
@@ -1031,13 +1042,19 @@ Screens:
                                           Notify("Nothing to send with the current filters.", NotificationType.Warning),
                                           Set(varSendRptFile, "Registrations_" & Text(Now(), "yyyymmdd-hhmmss") & ".csv");
                                           Set(varSendRptCSV,
-                                              "Date,Time Slot,Event,Name,Email,Status" & Char(10) &
+                                              "Date,Time Slot,Event,Name,Email,JobTitle,ExperienceLevel,AttendancePreference,OrgUnit,HeardFrom,Status" & Char(10) &
                                               Concat(galAdminRegs.AllItems,
                                                   Text(SessionDate, "yyyy-mm-dd") & "," &
                                                   Substitute(TimeSlot, ",", " ") & "," &
                                                   Substitute(Coalesce(EventName, ""), ",", " ") & "," &
                                                   Substitute(UserName, ",", " ") & "," &
-                                                  UserEmail & "," & Status,
+                                                  UserEmail & "," &
+                                                      Substitute(Coalesce(JobTitle, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(ExperienceLevel.Value, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(AttendancePreference.Value, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(OrgUnit.Value, ""), ",", " ") & "," &
+                                                      Substitute(Coalesce(HeardFrom.Value, ""), ",", " ") & "," &
+                                                      Status,
                                                   Char(10)));
                                           Set(varSendRptRows, CountRows(galAdminRegs.AllItems));
                                           Clear(colSendRptTo);

@@ -50,6 +50,20 @@ If(!IsBlank(Param("eventid")),
     Set(varDeepEvent, true));
 
 // ------------------------------------------------------------
+
+// ------------------------------------------------------------
+// Registrations list metadata (EventSessionRegistration_Registrations).
+// Beyond Title / SlotID / SessionDate / TimeSlot / EventID / EventName /
+// UserName / UserEmail / Status, the app also collects:
+//   JobTitle              = Single line of text
+//   ExperienceLevel       = Choice: Beginner, Intermediate, Advanced
+//   AttendancePreference  = Choice: In-Person, Virtual, No Preference
+//   OrgUnit               = Choice: HR, IT, Finance, Operations, Other
+//   HeardFrom             = Choice: Manager, Email, Teams, Colleague, Other
+// Create these columns in SharePoint first (see SharePoint/REGISTRATION-METADATA.md),
+// then refresh the data source in Studio.
+// ------------------------------------------------------------
+
 // Role lookup (EventSessionRegistration_AppRoles list).
 //   UserEmail = Person column (people picker - no typos possible)
 //   Role      = Choice column with exactly two choices: Admin, Coordinator
