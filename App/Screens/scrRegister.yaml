@@ -1694,10 +1694,110 @@ Screens:
                                           RadiusTopRight: =8
                                           RadiusBottomLeft: =8
                                           RadiusBottomRight: =8
+
+                                    - lblJobTitleKey_Reg:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: ="Job Title"
+                                          Height: =20
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =13
+                                          Color: =RGBA(104, 115, 138, 1)
+                                    - txtJobTitle_Reg:
+                                        Control: ModernTextInput@1.0.0
+                                        Properties:
+                                          Default: =""
+                                          Height: =44
+                                          FillPortions: =0
+                                          Size: =14
+                                          Type: =TextInputType.SingleLine
+                                          Placeholder: ="e.g. Operations Analyst"
+                                    - lblExperienceLevelKey_Reg:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: ="Experience Level"
+                                          Height: =20
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =13
+                                          Color: =RGBA(104, 115, 138, 1)
+                                    - cmbExperienceLevel_Reg:
+                                        Control: ModernCombobox@1.0.0
+                                        Properties:
+                                          Height: =44
+                                          FillPortions: =0
+                                          Size: =13
+                                          Items: =["Beginner", "Intermediate", "Advanced"]
+                                          ItemDisplayText: =ThisItem.Value
+                                          InputTextPlaceholder: ="Select experience level"
+                                          SelectMultiple: =false
+                                          IsSearchable: =false
+                                    - lblAttendancePreferenceKey_Reg:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: ="Attendance Preference"
+                                          Height: =20
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =13
+                                          Color: =RGBA(104, 115, 138, 1)
+                                    - cmbAttendancePreference_Reg:
+                                        Control: ModernCombobox@1.0.0
+                                        Properties:
+                                          Height: =44
+                                          FillPortions: =0
+                                          Size: =13
+                                          Items: =["In-Person", "Virtual", "No Preference"]
+                                          ItemDisplayText: =ThisItem.Value
+                                          InputTextPlaceholder: ="Select attendance preference"
+                                          SelectMultiple: =false
+                                          IsSearchable: =false
+                                    - lblOrgUnitKey_Reg:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: ="Organization Unit"
+                                          Height: =20
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =13
+                                          Color: =RGBA(104, 115, 138, 1)
+                                    - cmbOrgUnit_Reg:
+                                        Control: ModernCombobox@1.0.0
+                                        Properties:
+                                          Height: =44
+                                          FillPortions: =0
+                                          Size: =13
+                                          Items: =["HR", "IT", "Finance", "Operations", "Other"]
+                                          ItemDisplayText: =ThisItem.Value
+                                          InputTextPlaceholder: ="Select organization unit"
+                                          SelectMultiple: =false
+                                          IsSearchable: =false
+                                    - lblHeardFromKey_Reg:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: ="How Did You Hear About This?"
+                                          Height: =20
+                                          AutoHeight: =true
+                                          FillPortions: =0
+                                          Size: =13
+                                          Color: =RGBA(104, 115, 138, 1)
+                                    - cmbHeardFrom_Reg:
+                                        Control: ModernCombobox@1.0.0
+                                        Properties:
+                                          Height: =44
+                                          FillPortions: =0
+                                          Size: =13
+                                          Items: =["Manager", "Email", "Teams", "Colleague", "Other"]
+                                          ItemDisplayText: =ThisItem.Value
+                                          InputTextPlaceholder: ="Select how you heard about this"
+                                          SelectMultiple: =false
+                                          IsSearchable: =false
+
                                     - lblDetNote:
                                         Control: ModernText@1.0.0
                                         Properties:
-                                          Text: ="These details come from your signed-in Microsoft 365 account and will be used for this registration."
+                                          Text: ="Name and email come from your signed-in Microsoft 365 account. Complete the fields below so we can tailor this session."
                                           FillPortions: =1
                                           Size: =12
                                           Color: =RGBA(104, 115, 138, 1)
@@ -1733,7 +1833,7 @@ Screens:
                                         Control: GroupContainer
                                         Variant: AutoLayout
                                         Properties:
-                                          Height: =280
+                                          Height: =480
                                           FillPortions: =0
                                           LayoutDirection: =LayoutDirection.Vertical
                                           LayoutAlignItems: =LayoutAlignItems.Stretch
@@ -1919,6 +2019,148 @@ Screens:
                                                       FontWeight: =FontWeight.Bold
                                                       Align: =Align.Right
                                                       Color: =RGBA(23, 32, 51, 1)
+
+                                          - conRevRowJobTitle:
+                                              Control: GroupContainer
+                                              Variant: AutoLayout
+                                              Properties:
+                                                Height: =40
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutGap: =8
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                DropShadow: =DropShadow.None
+                                              Children:
+                                                - lblRevRowJobTitleKey:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: ="Job Title"
+                                                      FillPortions: =1
+                                                      Size: =13
+                                                      Color: =RGBA(104, 115, 138, 1)
+                                                - lblRevRowJobTitleVal:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =Trim(txtJobTitle_Reg.Text)
+                                                      FillPortions: =2
+                                                      Size: =13
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Right
+                                                      Color: =RGBA(23, 32, 51, 1)
+                                          - conRevRowExp:
+                                              Control: GroupContainer
+                                              Variant: AutoLayout
+                                              Properties:
+                                                Height: =40
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutGap: =8
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                DropShadow: =DropShadow.None
+                                              Children:
+                                                - lblRevRowExpKey:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: ="Experience"
+                                                      FillPortions: =1
+                                                      Size: =13
+                                                      Color: =RGBA(104, 115, 138, 1)
+                                                - lblRevRowExpVal:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =cmbExperienceLevel_Reg.Selected.Value
+                                                      FillPortions: =2
+                                                      Size: =13
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Right
+                                                      Color: =RGBA(23, 32, 51, 1)
+                                          - conRevRowAttend:
+                                              Control: GroupContainer
+                                              Variant: AutoLayout
+                                              Properties:
+                                                Height: =40
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutGap: =8
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                DropShadow: =DropShadow.None
+                                              Children:
+                                                - lblRevRowAttendKey:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: ="Attendance"
+                                                      FillPortions: =1
+                                                      Size: =13
+                                                      Color: =RGBA(104, 115, 138, 1)
+                                                - lblRevRowAttendVal:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =cmbAttendancePreference_Reg.Selected.Value
+                                                      FillPortions: =2
+                                                      Size: =13
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Right
+                                                      Color: =RGBA(23, 32, 51, 1)
+                                          - conRevRowOrg:
+                                              Control: GroupContainer
+                                              Variant: AutoLayout
+                                              Properties:
+                                                Height: =40
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutGap: =8
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                DropShadow: =DropShadow.None
+                                              Children:
+                                                - lblRevRowOrgKey:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: ="Org Unit"
+                                                      FillPortions: =1
+                                                      Size: =13
+                                                      Color: =RGBA(104, 115, 138, 1)
+                                                - lblRevRowOrgVal:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =cmbOrgUnit_Reg.Selected.Value
+                                                      FillPortions: =2
+                                                      Size: =13
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Right
+                                                      Color: =RGBA(23, 32, 51, 1)
+                                          - conRevRowHeard:
+                                              Control: GroupContainer
+                                              Variant: AutoLayout
+                                              Properties:
+                                                Height: =40
+                                                FillPortions: =0
+                                                LayoutDirection: =LayoutDirection.Horizontal
+                                                LayoutAlignItems: =LayoutAlignItems.Center
+                                                LayoutGap: =8
+                                                Fill: =RGBA(0, 0, 0, 0)
+                                                DropShadow: =DropShadow.None
+                                              Children:
+                                                - lblRevRowHeardKey:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: ="Heard From"
+                                                      FillPortions: =1
+                                                      Size: =13
+                                                      Color: =RGBA(104, 115, 138, 1)
+                                                - lblRevRowHeardVal:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =cmbHeardFrom_Reg.Selected.Value
+                                                      FillPortions: =2
+                                                      Size: =13
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Right
+                                                      Color: =RGBA(23, 32, 51, 1)
+
                                     - lblRevNote:
                                         Control: ModernText@1.0.0
                                         Properties:
@@ -2007,7 +2249,17 @@ Screens:
                                                     Notify("Please select an available time slot.", NotificationType.Warning),
                                                     Set(varRegStep, 3)),
                                             varRegStep = 3,
-                                                Set(varRegStep, 4),
+                                                If(IsBlank(Trim(txtJobTitle_Reg.Text)),
+                                                    Notify("Please enter your job title.", NotificationType.Warning),
+                                                IsBlank(cmbExperienceLevel_Reg.Selected),
+                                                    Notify("Please select your experience level.", NotificationType.Warning),
+                                                IsBlank(cmbAttendancePreference_Reg.Selected),
+                                                    Notify("Please select your attendance preference.", NotificationType.Warning),
+                                                IsBlank(cmbOrgUnit_Reg.Selected),
+                                                    Notify("Please select your organization unit.", NotificationType.Warning),
+                                                IsBlank(cmbHeardFrom_Reg.Selected),
+                                                    Notify("Please tell us how you heard about this session.", NotificationType.Warning),
+                                                    Set(varRegStep, 4)),
                                             ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
                                             With({seats: CountRows(Filter(colFutureRegs, SlotID = varSelectedSlot.ID)),
                                                   mine: CountRows(Filter(colFutureRegs, SlotID = varSelectedSlot.ID, UserEmail = Lower(User().Email))),
@@ -2044,6 +2296,11 @@ Screens:
                                                              EventName: varSelectedSlot.EventName,
                                                              UserName: User().FullName,
                                                              UserEmail: Lower(User().Email),
+                                                             JobTitle: Trim(txtJobTitle_Reg.Text),
+                                                             ExperienceLevel: {Value: cmbExperienceLevel_Reg.Selected.Value},
+                                                             AttendancePreference: {Value: cmbAttendancePreference_Reg.Selected.Value},
+                                                             OrgUnit: {Value: cmbOrgUnit_Reg.Selected.Value},
+                                                             HeardFrom: {Value: cmbHeardFrom_Reg.Selected.Value},
                                                              Status: "Confirmed"}),
                                                         Patch(EventSessionRegistration_Registrations, LookUp(EventSessionRegistration_Registrations, ID = varSwitchRegID),
                                                             {Title: varSelectedSlot.Title & " on " & Text(varSelectedSlot.SessionDate, "yyyy-mm-dd"),
@@ -2052,6 +2309,11 @@ Screens:
                                                              TimeSlot: varSelectedSlot.Title,
                                                              EventID: varSelectedSlot.EventID,
                                                              EventName: varSelectedSlot.EventName,
+                                                             JobTitle: Trim(txtJobTitle_Reg.Text),
+                                                             ExperienceLevel: {Value: cmbExperienceLevel_Reg.Selected.Value},
+                                                             AttendancePreference: {Value: cmbAttendancePreference_Reg.Selected.Value},
+                                                             OrgUnit: {Value: cmbOrgUnit_Reg.Selected.Value},
+                                                             HeardFrom: {Value: cmbHeardFrom_Reg.Selected.Value},
                                                              Status: "Confirmed"})));
                                                 Set(varWasSwitch, Coalesce(varSwitchRegID, 0) > 0);
                                                 With({tplKey: If(varWasSwitch, "SessionSwitched", "RegistrationConfirmed")},

@@ -2000,9 +2000,9 @@ Screens:
           Variant: ManualLayout
           Properties:
             X: =(Parent.Width - 520) / 2
-            Y: =Max(12, (Parent.Height - 560) / 2)
+            Y: =Max(8, (Parent.Height - 820) / 2)
             Width: =520
-            Height: =560
+            Height: =820
             Fill: =RGBA(255, 255, 255, 1)
             DropShadow: =DropShadow.None
             RadiusTopLeft: =14
@@ -2266,6 +2266,82 @@ Screens:
                   Size: =12
                   Wrap: =true
                   Color: =RGBA(104, 115, 138, 1)
+            - lblRegMetaHeader_EvQ:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: ="A few more details"
+                  X: =24
+                  Y: =304
+                  Width: =Parent.Width - 48
+                  Height: =24
+                  AutoHeight: =true
+                  Size: =13
+                  FontWeight: =FontWeight.Bold
+                  Color: =RGBA(23, 32, 51, 1)
+            - txtJobTitle_EvQ:
+                Control: ModernTextInput@1.0.0
+                Properties:
+                  X: =24
+                  Y: =334
+                  Width: =Parent.Width - 48
+                  Height: =40
+                  Size: =13
+                  Default: =""
+                  Placeholder: ="Job title"
+                  Type: =TextInputType.SingleLine
+            - cmbExperienceLevel_EvQ:
+                Control: ModernCombobox@1.0.0
+                Properties:
+                  X: =24
+                  Y: =382
+                  Width: =Parent.Width - 48
+                  Height: =40
+                  Size: =13
+                  Items: =["Beginner", "Intermediate", "Advanced"]
+                  ItemDisplayText: =ThisItem.Value
+                  InputTextPlaceholder: ="Experience level"
+                  SelectMultiple: =false
+                  IsSearchable: =false
+            - cmbAttendancePreference_EvQ:
+                Control: ModernCombobox@1.0.0
+                Properties:
+                  X: =24
+                  Y: =430
+                  Width: =Parent.Width - 48
+                  Height: =40
+                  Size: =13
+                  Items: =["In-Person", "Virtual", "No Preference"]
+                  ItemDisplayText: =ThisItem.Value
+                  InputTextPlaceholder: ="Attendance preference"
+                  SelectMultiple: =false
+                  IsSearchable: =false
+            - cmbOrgUnit_EvQ:
+                Control: ModernCombobox@1.0.0
+                Properties:
+                  X: =24
+                  Y: =478
+                  Width: =Parent.Width - 48
+                  Height: =40
+                  Size: =13
+                  Items: =["HR", "IT", "Finance", "Operations", "Other"]
+                  ItemDisplayText: =ThisItem.Value
+                  InputTextPlaceholder: ="Organization unit"
+                  SelectMultiple: =false
+                  IsSearchable: =false
+            - cmbHeardFrom_EvQ:
+                Control: ModernCombobox@1.0.0
+                Properties:
+                  X: =24
+                  Y: =526
+                  Width: =Parent.Width - 48
+                  Height: =40
+                  Size: =13
+                  Items: =["Manager", "Email", "Teams", "Colleague", "Other"]
+                  ItemDisplayText: =ThisItem.Value
+                  InputTextPlaceholder: ="How did you hear about this?"
+                  SelectMultiple: =false
+                  IsSearchable: =false
+
             - btnRegModalCancel_EvQ:
                 Control: ModernButton@1.0.0
                 Properties:
@@ -2323,6 +2399,8 @@ Screens:
                   RadiusBottomRight: =8
                   OnSelect: |-
                     =ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
+                    If(Or(IsBlank(Trim(txtJobTitle_EvQ.Text)), IsBlank(cmbExperienceLevel_EvQ.Selected), IsBlank(cmbAttendancePreference_EvQ.Selected), IsBlank(cmbOrgUnit_EvQ.Selected), IsBlank(cmbHeardFrom_EvQ.Selected)),
+                        Notify("Please complete all five registration details before confirming.", NotificationType.Warning),
                     With({seats: CountRows(Filter(colFutureRegs, SlotID = varEvqSelSlot.ID)),
                           mine: CountRows(Filter(colFutureRegs, SlotID = varEvqSelSlot.ID, UserEmail = Lower(User().Email))),
                           clash: CountRows(Filter(colFutureRegs,
@@ -2358,6 +2436,11 @@ Screens:
                                      EventName: varEvqSelSlot.EventName,
                                      UserName: User().FullName,
                                      UserEmail: Lower(User().Email),
+                                     JobTitle: Trim(txtJobTitle_EvQ.Text),
+                                     ExperienceLevel: {Value: cmbExperienceLevel_EvQ.Selected.Value},
+                                     AttendancePreference: {Value: cmbAttendancePreference_EvQ.Selected.Value},
+                                     OrgUnit: {Value: cmbOrgUnit_EvQ.Selected.Value},
+                                     HeardFrom: {Value: cmbHeardFrom_EvQ.Selected.Value},
                                      Status: "Confirmed"}),
                                 Patch(EventSessionRegistration_Registrations, LookUp(EventSessionRegistration_Registrations, ID = varEvqSwitchRegID),
                                     {Title: varEvqSelSlot.Title & " on " & Text(varEvqSelSlot.SessionDate, "yyyy-mm-dd"),
@@ -2366,6 +2449,11 @@ Screens:
                                      TimeSlot: varEvqSelSlot.Title,
                                      EventID: varEvqSelSlot.EventID,
                                      EventName: varEvqSelSlot.EventName,
+                                     JobTitle: Trim(txtJobTitle_EvQ.Text),
+                                     ExperienceLevel: {Value: cmbExperienceLevel_EvQ.Selected.Value},
+                                     AttendancePreference: {Value: cmbAttendancePreference_EvQ.Selected.Value},
+                                     OrgUnit: {Value: cmbOrgUnit_EvQ.Selected.Value},
+                                     HeardFrom: {Value: cmbHeardFrom_EvQ.Selected.Value},
                                      Status: "Confirmed"})));
                         Set(varWasSwitch, Coalesce(varEvqSwitchRegID, 0) > 0);
                         With({tplKey: If(varWasSwitch, "SessionSwitched", "RegistrationConfirmed")},
@@ -2398,7 +2486,7 @@ Screens:
                         ClearCollect(colFutureRegs, Filter(EventSessionRegistration_Registrations, Status = "Confirmed", SessionDate >= Today()));
                         ClearCollect(colMyEvRegs_EvQ, SortByColumns(Filter(EventSessionRegistration_Registrations, EventID = varDetailEventID, UserEmail = Lower(User().Email), Status = "Confirmed"), "SessionDate", SortOrder.Ascending));
                         Set(varEvqSelSlot, Blank());
-                        Set(varShowConfModal_EvQ, true)))
+                        Set(varShowConfModal_EvQ, true))))
       # ---------------- CONFIRMATION MODAL (screen level, on top) ----------------
       - recConfOverlay_EvQ:
           Control: ModernText@1.0.0
