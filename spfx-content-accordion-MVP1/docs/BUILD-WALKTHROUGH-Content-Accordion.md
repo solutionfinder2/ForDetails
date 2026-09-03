@@ -1,6 +1,6 @@
 # Build Walkthrough — Content Accordion (spfx-content-accordion)
 
-**Creator:** Teshome S. | **Release:** MVP 1 (v1.0.0)
+**Creator:** IT Department | **Release:** MVP 1 (v1.0.0)
 
 This document explains how the **Content Accordion** web part was built, step by step, as if
 you were building it manually. It reads sections from a SharePoint list and renders the
@@ -473,7 +473,7 @@ accordion line-art icon: piano keys, bellows, buttons; source image in
 `webpart-icon.png` at the project root), which SharePoint shows in the web part picker
 instead of the generic Fluent font icon. Embedding the image as a data URI means no
 external hosting is needed — the icon travels inside the package.
-Solution authorship ("Teshome S.") is recorded in `package-solution.json` under
+Solution authorship is recorded in `package-solution.json` under
 `solution.developer.name` and in the catalog descriptions under `solution.metadata`.
 
 ## Step 9 — Run, test, package

@@ -2,7 +2,7 @@
 
 **Applies to:** Showme Accordion web part, version 1.0.8 (MVP 1)
 **Audience:** Page editors and content authors (no technical skills required)
-**Created by:** Teshome S.
+**Created by:** IT Department
 **Last updated:** September 1, 2026
 
 ---
@@ -205,4 +205,4 @@ columns and auto-corrects the pickers.
 - **Technical issues**: contact your SharePoint administrator with the text from the
   error's **Show details** link, if one is shown.
 
-*Solution: spfx-content-accordion v1.0.8.0 — "Showme Accordion" MVP 1, created by Teshome S.*
+*Solution: spfx-content-accordion v1.0.8.0 — "Showme Accordion" MVP 1, created by the IT Department.*
