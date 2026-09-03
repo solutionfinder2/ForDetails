@@ -19,6 +19,7 @@ Follow the documents in this order:
 | 6 | `Docs/SOP.md` | Standard operating procedures for admins (promote an event, roles, external list, reports…) |
 | 7 | `Docs/HOW-TO.md` | End-user guide (register, switch, cancel, add to calendar) |
 | 8 | `Docs/DEVELOPER-GUIDE.md` | Architecture, screens, variables, flows, and conventions for whoever maintains this |
+| 9 | `Docs/FLOWS-DEVELOPER-GUIDE.md` | Deep action-by-action developer guide to all 7 flows: parameters, expressions, packaging, debugging |
 
 ## What this edition is
 
@@ -62,5 +63,6 @@ WeeklySessionRegistration-Minimal-PROD/
    ├─ LISTS.md                    <- list & column metadata reference
    ├─ SOP.md                      <- admin operating procedures
    ├─ HOW-TO.md                   <- end-user guide
-   └─ DEVELOPER-GUIDE.md          <- maintainer documentation
+   ├─ DEVELOPER-GUIDE.md          <- maintainer documentation
+   └─ FLOWS-DEVELOPER-GUIDE.md    <- deep developer guide to the 7 flows
 ```
