@@ -1712,14 +1712,18 @@ Screens:
                                     Set(varRegModalStep, If(Coalesce(varEvqSwitchRegID, 0) > 0 || !Coalesce(varEventDetail.AllowRegisterForOthers, true), 2, 1)); Set(varRegOnBehalf, Blank()); If(Coalesce(varEvqSwitchRegID, 0) = 0, Set(varRegTargetEmail, Lower(User().Email)); Set(varRegTargetName, User().FullName); Set(varRegPrefill, Blank())); Set(varRegForSelf, Lower(Coalesce(varRegTargetEmail, Lower(User().Email))) = Lower(User().Email)); Reset(txtRegPhone_EvQ); Reset(cmbRegDept_EvQ); Reset(cmbRegSite_EvQ); Reset(cmbRegQ1_EvQ); Reset(cmbRegQ2_EvQ); Set(varShowRegModal_EvQ, true))
       # ---------------- SHARE EVENT MODAL (screen level, on top) ----------------
       - recShareEvQOverlay:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowShareEvQ
             OnSelect: =Set(varShowShareEvQ, false)
       - conShareEvQModal:
@@ -2054,14 +2058,18 @@ Screens:
                         OnSelect: =Select(Parent)
       # ---------------- CANCEL REGISTRATION MODAL (screen level, on top) ----------------
       - recCancelEvQOverlay:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowCancelEvQ
             OnSelect: =Set(varShowCancelEvQ, false)
       - conCancelEvQModal:
@@ -2179,14 +2187,18 @@ Screens:
                     Notify("Registration cancelled. The seat is now available.", NotificationType.Success)
       # ---------------- REGISTER / SWITCH MODAL (screen level, on top) ----------------
       - recRegModalOverlay_EvQ:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowRegModal_EvQ
             OnSelect: =Set(varShowRegModal_EvQ, false)
       - conRegModal_EvQ:
@@ -3186,14 +3198,18 @@ Screens:
                         Set(varShowConfModal_EvQ, true)))
       # ---------------- CONFIRMATION MODAL (screen level, on top) ----------------
       - recConfOverlay_EvQ:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowConfModal_EvQ
             OnSelect: =Set(varShowConfModal_EvQ, false)
       - conConfModal_EvQ:

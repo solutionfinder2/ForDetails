@@ -3532,14 +3532,18 @@ Screens:
                                           Fill: =RGBA(228, 231, 239, 1)
       # ---------------- NEW SESSION MODAL (screen level, on top) ----------------
       - recNewSessionOverlay:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowNewSession
             OnSelect: =Set(varShowNewSession, false)
       - conNewSessionModal:
@@ -3952,14 +3956,18 @@ Screens:
                         Notify("Session created: " & varNewSession.Title & " on " & Text(varNewSession.SessionDate, "ddd, mmm d"), NotificationType.Success)))
       # ---------------- SESSION DETAILS MODAL (screen level, on top) ----------------
       - recSessionDetailOverlay:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowSessionDetail
             OnSelect: =Set(varShowSessionDetail, false)
       - conSessionDetailModal:
@@ -4229,14 +4237,18 @@ Screens:
                   OnSelect: =Set(varShowSessionDetail, false)
       # ---------------- EVENT MODAL (screen level, on top) ----------------
       - recEventModalOverlay:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowEventModal
             OnSelect: =Set(varShowEventModal, false)
       - conEventModal:
@@ -5331,14 +5343,18 @@ Screens:
                         OnSelect: =Select(Parent)
       # ---------------- SEND REPORT MODAL (screen level, on top) ----------------
       - recSendRptOverlay:
-          Control: ModernText@1.0.0
+          Control: HtmlViewer@2.1.0
           Properties:
-            Text: =""
+            HtmlText: ="<div style='position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(20,24,42,0.35);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);'></div>"
             X: =0
             Y: =0
             Width: =Parent.Width
             Height: =Parent.Height
-            Fill: =RGBA(20, 24, 42, 0.45)
+            BorderStyle: =BorderStyle.None
+            PaddingTop: =0
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
             Visible: =varShowSendRpt
             OnSelect: =Set(varShowSendRpt, false)
       - conSendRptModal:
