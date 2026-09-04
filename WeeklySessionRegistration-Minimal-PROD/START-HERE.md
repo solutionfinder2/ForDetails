@@ -1,4 +1,4 @@
-﻿# Weekly Session Registration — Minimal Edition (Production Kit)
+# Weekly Session Registration — Minimal Edition (Production Kit)
 
 Everything needed to stand up the **three-screen minimal edition**
 (`scrIntro`, `scrEventQuickReg`, `scrAdmin`) in a new environment.
@@ -13,7 +13,7 @@ Follow the documents in this order:
 |---|---|---|
 | 1 | **`DEPLOYMENT.md`** | The complete step-by-step deployment: lists → flows → app → configuration → smoke test |
 | 2 | `SharePoint/` | Scripts that create the lists and columns (`RUN-SCRIPT.md` explains how to run them) |
-| 3 | `Flow/` | The flow solution zip (v1.0.0.17, 7 flows) + legacy per-flow packages + `MANUAL-FLOWS.md` (build-by-hand guide) |
+| 3 | `Flow/` | The flow solution zip (v1.0.0.18, 7 flows) + legacy per-flow packages + `MANUAL-FLOWS.md` (build-by-hand guide) |
 | 4 | `App/` | `OnStart.txt` and the three screen YAML files to paste into a new canvas app |
 | 5 | `Docs/LISTS.md` | **List metadata reference** — every list, every column, types, choices, and the external-list contract |
 | 6 | `Docs/SOP.md` | Standard operating procedures for admins (promote an event, roles, external list, reports…) |
@@ -51,7 +51,7 @@ WeeklySessionRegistration-Minimal-PROD/
 │     ├─ scrEventQuickReg.yaml
 │     └─ scrAdmin.yaml
 ├─ Flow/
-│  ├─ EventSessionFlows_NoTemplates_1_0_0_17.zip   <- solution import (preferred)
+│  ├─ EventSessionFlows_NoTemplates_1_0_0_18.zip   <- solution import (preferred)
 │  ├─ Packages/                   <- legacy per-flow zips (fallback) + bundle
 │  └─ MANUAL-FLOWS.md             <- click-by-click designer guide
 ├─ SharePoint/

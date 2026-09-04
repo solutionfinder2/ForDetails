@@ -25,7 +25,7 @@ Companion docs: `DEVELOPER-GUIDE.md` (app architecture),
 
 Source of truth: `Flow/SolutionPackage-NoTemplates/Workflows/*.json`
 (one JSON per flow, named `<Name>-<GUID>.json`). The shipped zip is
-**v1.0.0.17**.
+**v1.0.0.18**.
 
 ---
 
@@ -46,8 +46,11 @@ Consequences when editing:
   `Flow.Run(...)` call in the app would silently shift its arguments.
 - **Append** new parameters at the end, then in Studio remove and re-add
   the flow so it picks up the new signature, and update every call site.
-- Keep new parameters in the `required` array (optional params change
-  the generated `Run` signature in confusing ways).
+- Prefer keeping new parameters in the `required` array. Inputs left
+  **optional** (not in `required`) become *optional trailing
+  arguments* in `Run` — older call sites that omit them keep
+  working. SendAppEmail's `CalendarLink` uses this deliberately so
+  3-argument callers (cancellations, other editions) need no edits.
 
 ### 2.2 Connection references
 
@@ -174,6 +177,7 @@ person. All register/switch/cancel notifications go through it.
 | 1 | `text` | To | Recipient email |
 | 2 | `text_1` | Subject | Email subject / card title |
 | 3 | `text_2` | Body | Plain text with `Char(10)` newlines |
+| 4 | `text_3` | CalendarLink | **Optional.** Outlook "add event" deep link. When non-blank, the email gets an **Add to calendar** button and the Teams card gets an `Action.OpenUrl` action. The app passes it on register/switch confirmations and omits it on cancellations |
 
 **Actions:** `Send_an_email_(V2)` (HTML shell, § 2.4) →
 `Post_adaptive_card_in_Teams` (§ 2.5) → `Teams_card_optional` (§ 2.6) →
@@ -397,7 +401,7 @@ If(IsError(EventSession_SyncExternalList.Run(
 every external site used. `ensureuser` additionally requires the target
 users to be resolvable in that site's tenant.
 
-**Built-in mapping profile for a pre-existing legacy list (v1.0.0.17):** the flow can
+**Built-in mapping profile for a pre-existing legacy list (v1.0.0.18):** the flow can
 also target an existing list whose internal names don't follow the
 contract. After `Payload_final`, a Compose named
 `Payload_testing_profile` builds an alternate payload, and
@@ -516,11 +520,11 @@ Workflows/*.json        <- one per flow
 
 Checklist for every rebuild:
 
-1. **Bump `<Version>` in `solution.xml`** (e.g. `1.0.0.17`) — Dataverse
+1. **Bump `<Version>` in `solution.xml`** (e.g. `1.0.0.18`) — Dataverse
    may reject importing the same version over itself.
 2. Zip the three XML files + the `Workflows/` folder (folder structure
    preserved, files at root).
-3. Name the zip to match: `EventSessionFlows_NoTemplates_1_0_0_17.zip`.
+3. Name the zip to match: `EventSessionFlows_NoTemplates_1_0_0_18.zip`.
 
 ### 5.3 Adding a brand-new flow to the solution
 

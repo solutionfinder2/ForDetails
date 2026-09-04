@@ -111,6 +111,28 @@ replace(triggerBody()?['text_2'], decodeUriComponent('%0A'), '<br>')
 Then in the HTML shell, insert **Outputs** of that Compose where the
 message text goes.
 
+**Optional — Add to calendar button (email + Teams card):** add a
+fourth text input on the trigger titled `CalendarLink` and mark it
+**optional** (… menu on the input → *Make the field optional*). Then:
+
+- In the email Body HTML, just before the footer `<div>`, insert this
+  expression:
+
+  ```
+  if(empty(trim(coalesce(triggerBody()?['text_3'], ''))), '', concat('<div style="padding:0 28px 24px 28px;background-color:#FFFFFF;"><a href="', triggerBody()?['text_3'], '" style="display:inline-block;background-color:#373F4B;color:#FFFFFF;text-decoration:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:bold;">&#128197; Add to calendar</a></div>'))
+  ```
+
+- If you also post the Teams adaptive card, insert this expression
+  between the closing `]` of the card's `body` array and the final `}`:
+
+  ```
+  if(empty(trim(coalesce(triggerBody()?['text_3'], ''))), '', concat(', "actions": [{"type": "Action.OpenUrl", "title": "Add to calendar", "url": "', triggerBody()?['text_3'], '"}]'))
+  ```
+
+The app passes an Outlook "add event" deep link on register/switch
+confirmations; when the input is blank (cancellations, older call
+sites) no button is rendered.
+
 ---
 
 ## 2. `EventSession_ExportCSV`

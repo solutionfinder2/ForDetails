@@ -65,7 +65,7 @@ the sender *be* the connection owner.
 1. Sign in to [make.powerautomate.com](https://make.powerautomate.com)
    **as the service account**, pick the target environment.
 2. **Solutions > Import solution** >
-   `EventSessionFlows_NoTemplates_1_0_0_17.zip`.
+   `EventSessionFlows_NoTemplates_1_0_0_18.zip`.
 3. When prompted for the four connections, **create new** ones — they
    will be owned by the service account.
 4. Turn the seven flows On.

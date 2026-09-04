@@ -1,6 +1,6 @@
 # Importing the flows (Minimal edition)
 
-`EventSessionFlows_NoTemplates_1_0_0_17.zip` is the flow package that
+`EventSessionFlows_NoTemplates_1_0_0_18.zip` is the flow package that
 pairs with the minimal app. It contains all **seven** flows, is
 tenant-neutral, and has **no EmailTemplates list dependency** (this
 edition sends emails with hardcoded subject/body from the screens).

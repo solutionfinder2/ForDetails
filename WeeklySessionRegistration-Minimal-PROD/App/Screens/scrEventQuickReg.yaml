@@ -3149,7 +3149,10 @@ Screens:
                                         Coalesce(varNewReg.Question1.Value, ""),
                                         Coalesce(varNewReg.Question2.Value, ""))),
                                     Notify("Saved, but the event's external list could not be updated.", NotificationType.Warning))));
-                        With({link: Coalesce(varEventDetail.MeetingLink, "")},
+                        With({link: Coalesce(varEventDetail.MeetingLink, ""),
+                              calP: Split(varNewReg.TimeSlot, " – ")},
+                            With({calStart: varNewReg.SessionDate + IfError(TimeValue(First(calP).Value), Time(9, 0, 0)),
+                                  calEnd: varNewReg.SessionDate + IfError(TimeValue(Last(calP).Value), Time(15, 0, 0))},
                             If(IsError(
                                 EventSession_SendAppEmail.Run(
                                     varNewReg.UserEmail,
@@ -3163,8 +3166,15 @@ Screens:
                                     "Date: " & Text(varNewReg.SessionDate, "dddd, mmmm d, yyyy") & Char(10) &
                                     "Time: " & varNewReg.TimeSlot & Char(10) &
                                     "Reference: WSR-" & Text(varNewReg.ID) &
-                                    If(link = "", "", Char(10) & "Meeting link: " & link))),
-                                Notify("Registered, but the confirmation email could not be sent.", NotificationType.Warning)));
+                                    If(link = "", "", Char(10) & "Meeting link: " & link),
+                                    "https://outlook.office.com/calendar/0/action/compose?rru=addevent" &
+                                        "&subject=" & EncodeUrl(Coalesce(varNewReg.EventName, "Session") & " - " & varNewReg.TimeSlot) &
+                                        "&startdt=" & Text(calStart, "yyyy-mm-ddThh:mm:ss") &
+                                        "&enddt=" & Text(calEnd, "yyyy-mm-ddThh:mm:ss") &
+                                        "&location=" & EncodeUrl(Coalesce(varEventDetail.Location, "")) &
+                                        "&body=" & EncodeUrl("Reference: WSR-" & Text(varNewReg.ID) &
+                                            If(link = "", "", " | Meeting link: " & link)))),
+                                Notify("Registered, but the confirmation email could not be sent.", NotificationType.Warning))));
                         Set(varEvqSwitchRegID, 0);
                         Set(varEvqSwitchRegLabel, "");
                         Set(varShowRegModal_EvQ, false);
