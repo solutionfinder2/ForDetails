@@ -2840,13 +2840,46 @@ Screens:
                                                 TemplatePadding: =0
                                                 Items: =FirstN(SortByColumns(colAdminRegs, "ID", SortOrder.Descending), 10)
                                               Children:
+                                                - recDashRegAv:
+                                                    Control: ModernText@1.0.0
+                                                    Properties:
+                                                      Text: =Upper(Left(Trim(ThisItem.UserName), 1))
+                                                      X: =0
+                                                      Y: =11
+                                                      Width: =36
+                                                      Height: =36
+                                                      Size: =13
+                                                      FontWeight: =FontWeight.Bold
+                                                      Align: =Align.Center
+                                                      VerticalAlign: =VerticalAlign.Middle
+                                                      Fill: =RGBA(232, 234, 238, 1)
+                                                      Color: =RGBA(55, 63, 75, 1)
+                                                      RadiusTopLeft: =18
+                                                      RadiusTopRight: =18
+                                                      RadiusBottomLeft: =18
+                                                      RadiusBottomRight: =18
+                                                - imgDashRegAv:
+                                                    Control: Image
+                                                    Properties:
+                                                      Image: |-
+                                                        =If(Lower(ThisItem.UserEmail) = Lower(User().Email) && !IsBlank(User().Image), User().Image,
+                                                            IfError(Office365Users.UserPhotoV2(Lower(ThisItem.UserEmail)), Blank()))
+                                                      X: =0
+                                                      Y: =11
+                                                      Width: =36
+                                                      Height: =36
+                                                      ImagePosition: =ImagePosition.Fill
+                                                      RadiusTopLeft: =18
+                                                      RadiusTopRight: =18
+                                                      RadiusBottomLeft: =18
+                                                      RadiusBottomRight: =18
                                                 - lblDashRegName:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Text: =ThisItem.UserName
-                                                      X: =0
+                                                      X: =46
                                                       Y: =8
-                                                      Width: =Parent.TemplateWidth - 190
+                                                      Width: =Parent.TemplateWidth - 236
                                                       Height: =20
                                                       AutoHeight: =true
                                                       Size: =13
@@ -2856,9 +2889,9 @@ Screens:
                                                     Control: ModernText@1.0.0
                                                     Properties:
                                                       Text: =ThisItem.EventName & " · " & ThisItem.TimeSlot & " · " & Text(ThisItem.SessionDate, "mmm d")
-                                                      X: =0
+                                                      X: =46
                                                       Y: =28
-                                                      Width: =Parent.TemplateWidth - 190
+                                                      Width: =Parent.TemplateWidth - 236
                                                       Height: =18
                                                       AutoHeight: =true
                                                       Size: =12
