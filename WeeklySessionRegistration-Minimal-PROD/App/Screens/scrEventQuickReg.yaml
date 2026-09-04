@@ -3217,9 +3217,9 @@ Screens:
           Variant: ManualLayout
           Properties:
             X: =(Parent.Width - 560) / 2
-            Y: =Max(12, (Parent.Height - 620) / 2)
+            Y: =Max(12, (Parent.Height - 690) / 2)
             Width: =560
-            Height: =620
+            Height: =690
             Fill: =RGBA(255, 255, 255, 1)
             DropShadow: =DropShadow.None
             RadiusTopLeft: =14
@@ -3300,7 +3300,7 @@ Screens:
                   X: =40
                   Y: =196
                   Width: =480
-                  Height: =240
+                  Height: =306
                   Fill: =RGBA(255, 255, 255, 1)
                   BorderColor: =RGBA(228, 231, 239, 1)
                   BorderThickness: =1
@@ -3308,12 +3308,80 @@ Screens:
                   RadiusTopRight: =12
                   RadiusBottomLeft: =12
                   RadiusBottomRight: =12
+            - recConfAv_EvQ:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: =If(IsBlank(varNewReg), "", Upper(Left(Trim(varNewReg.UserName), 1)))
+                  X: =62
+                  Y: =212
+                  Width: =40
+                  Height: =40
+                  Size: =14
+                  FontWeight: =FontWeight.Bold
+                  Align: =Align.Center
+                  VerticalAlign: =VerticalAlign.Middle
+                  Fill: =RGBA(232, 234, 238, 1)
+                  Color: =RGBA(55, 63, 75, 1)
+                  RadiusTopLeft: =20
+                  RadiusTopRight: =20
+                  RadiusBottomLeft: =20
+                  RadiusBottomRight: =20
+            - imgConfAv_EvQ:
+                Control: Image
+                Properties:
+                  Image: |-
+                    =If(IsBlank(varNewReg), Blank(),
+                        If(Lower(varNewReg.UserEmail) = Lower(User().Email) && !IsBlank(User().Image), User().Image,
+                            IfError(Office365Users.UserPhotoV2(Lower(varNewReg.UserEmail)), Blank())))
+                  X: =62
+                  Y: =212
+                  Width: =40
+                  Height: =40
+                  ImagePosition: =ImagePosition.Fill
+                  RadiusTopLeft: =20
+                  RadiusTopRight: =20
+                  RadiusBottomLeft: =20
+                  RadiusBottomRight: =20
+            - lblConfRegName_EvQ:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: |-
+                    =If(IsBlank(varNewReg), "—",
+                        varNewReg.UserName & If(Lower(varNewReg.UserEmail) = Lower(User().Email), " (You)", ""))
+                  X: =114
+                  Y: =212
+                  Width: =384
+                  Height: =22
+                  AutoHeight: =true
+                  Size: =13
+                  FontWeight: =FontWeight.Bold
+                  Color: =RGBA(23, 32, 51, 1)
+            - lblConfRegMail_EvQ:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: =If(IsBlank(varNewReg), "", Lower(varNewReg.UserEmail))
+                  X: =114
+                  Y: =234
+                  Width: =384
+                  Height: =18
+                  AutoHeight: =true
+                  Size: =11
+                  Color: =RGBA(104, 115, 138, 1)
+            - recConfDiv0_EvQ:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: =""
+                  X: =62
+                  Y: =264
+                  Width: =436
+                  Height: =1
+                  Fill: =RGBA(238, 238, 238, 1)
             - lblConfRow1Key_EvQ:
                 Control: ModernText@1.0.0
                 Properties:
                   Text: ="Date"
                   X: =62
-                  Y: =210
+                  Y: =276
                   Width: =140
                   Height: =28
                   AutoHeight: =true
@@ -3324,7 +3392,7 @@ Screens:
                 Properties:
                   Text: =If(IsBlank(varNewReg), "—", Text(varNewReg.SessionDate, "ddd, mmm d, yyyy"))
                   X: =202
-                  Y: =210
+                  Y: =276
                   Width: =296
                   Height: =28
                   AutoHeight: =true
@@ -3337,7 +3405,7 @@ Screens:
                 Properties:
                   Text: =""
                   X: =62
-                  Y: =250
+                  Y: =316
                   Width: =436
                   Height: =1
                   Fill: =RGBA(238, 238, 238, 1)
@@ -3346,7 +3414,7 @@ Screens:
                 Properties:
                   Text: ="Time Slot"
                   X: =62
-                  Y: =264
+                  Y: =330
                   Width: =140
                   Height: =28
                   AutoHeight: =true
@@ -3359,7 +3427,7 @@ Screens:
                     =If(IsBlank(varNewReg), "—",
                         varNewReg.TimeSlot & If(IsBlank(varNewReg.EventName), "", "  ·  " & varNewReg.EventName))
                   X: =202
-                  Y: =264
+                  Y: =330
                   Width: =296
                   Height: =28
                   AutoHeight: =true
@@ -3372,7 +3440,7 @@ Screens:
                 Properties:
                   Text: =""
                   X: =62
-                  Y: =304
+                  Y: =370
                   Width: =436
                   Height: =1
                   Fill: =RGBA(238, 238, 238, 1)
@@ -3381,7 +3449,7 @@ Screens:
                 Properties:
                   Text: ="Reference ID"
                   X: =62
-                  Y: =318
+                  Y: =384
                   Width: =140
                   Height: =28
                   AutoHeight: =true
@@ -3392,7 +3460,7 @@ Screens:
                 Properties:
                   Text: =If(IsBlank(varNewReg), "WSR-0000", "WSR-" & Text(varNewReg.ID))
                   X: =202
-                  Y: =318
+                  Y: =384
                   Width: =296
                   Height: =28
                   AutoHeight: =true
@@ -3405,7 +3473,7 @@ Screens:
                 Properties:
                   Text: =""
                   X: =62
-                  Y: =358
+                  Y: =424
                   Width: =436
                   Height: =1
                   Fill: =RGBA(238, 238, 238, 1)
@@ -3415,7 +3483,7 @@ Screens:
                 Properties:
                   Text: ="Meeting Link"
                   X: =62
-                  Y: =372
+                  Y: =438
                   Width: =140
                   Height: =52
                   AutoHeight: =true
@@ -3427,7 +3495,7 @@ Screens:
                 Properties:
                   Text: =varEventDetail.MeetingLink
                   X: =202
-                  Y: =372
+                  Y: =438
                   Width: =296
                   Height: =52
                   AutoHeight: =true
@@ -3442,7 +3510,7 @@ Screens:
                 Properties:
                   Text: ="Back to Home"
                   X: =40
-                  Y: =488
+                  Y: =554
                   Width: =480
                   Height: =44
                   Size: =14
@@ -3460,7 +3528,7 @@ Screens:
                 Properties:
                   Text: ="Stay on this Page"
                   X: =40
-                  Y: =544
+                  Y: =610
                   Width: =480
                   Height: =44
                   Size: =14
