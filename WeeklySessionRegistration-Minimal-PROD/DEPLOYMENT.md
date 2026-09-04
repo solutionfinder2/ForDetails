@@ -85,7 +85,7 @@ The most common miss is the three manual columns above.
 
 1. [make.powerautomate.com](https://make.powerautomate.com) > pick the
    environment > **Solutions** > **Import solution**.
-2. Select `Flow/EventSessionFlows_NoTemplates_1_0_0_16.zip`.
+2. Select `Flow/EventSessionFlows_NoTemplates_1_0_0_17.zip`.
 3. Map the **four connections** when prompted: SharePoint, Office 365
    Outlook, OneDrive for Business, Microsoft Teams (create them if they
    don't exist).
@@ -266,10 +266,10 @@ Run through this list end to end before announcing the app:
 
 | Symptom | Fix |
 |---|---|
-| Import error "â€¦not declared in the solution file as a root component" | You are importing an old zip; use `EventSessionFlows_NoTemplates_1_0_0_16.zip` from this kit |
+| Import error "â€¦not declared in the solution file as a root component" | You are importing an old zip; use `EventSessionFlows_NoTemplates_1_0_0_17.zip` from this kit |
 | "The solution file is invalidâ€¦" on import | You picked a legacy per-flow zip under **Solutions > Import**. Legacy zips go through **My flows > Import > Import Package (Legacy)** |
 | Emails don't arrive | Flow turned off, or the Outlook connection was mapped to the wrong account. Check the flow run history |
-| Teams card shows literal `\n` | Old flow version â€” re-import v1.0.0.16 |
+| Teams card shows literal `\n` | Old flow version â€” re-import v1.0.0.17 |
 | App treats everyone as Admin | `EventSessionRegistration_AppRoles` is empty â€” add your Admin row (4.1) |
 | Deep link opens the Intro instead of the event | `StartScreen` formula not set (3.3), or `varAppURL` still blank (3.5) |
 | External list not updating | Event's SPSiteURL/SPListName blank or wrong; flow connection lacks Edit on the target site; check `EventSession_SyncExternalList` run history |

@@ -25,7 +25,7 @@ Companion docs: `DEVELOPER-GUIDE.md` (app architecture),
 
 Source of truth: `Flow/SolutionPackage-NoTemplates/Workflows/*.json`
 (one JSON per flow, named `<Name>-<GUID>.json`). The shipped zip is
-**v1.0.0.16**.
+**v1.0.0.17**.
 
 ---
 
@@ -378,7 +378,7 @@ If(IsError(EventSession_SyncExternalList.Run(
 every external site used. `ensureuser` additionally requires the target
 users to be resolvable in that site's tenant.
 
-**Built-in mapping profile for a pre-existing legacy list (v1.0.0.16):** the flow can
+**Built-in mapping profile for a pre-existing legacy list (v1.0.0.17):** the flow can
 also target an existing list whose internal names don't follow the
 contract. After `Payload_final`, a Compose named
 `Payload_testing_profile` builds an alternate payload, and
@@ -398,12 +398,20 @@ used; otherwise the generic contract payload is. Profile mapping:
 | `Rsa_x0020_token` | Yubikey (choice yes/no) | Question1, lowercased |
 | `Do_x0020_you_x0020_know_x003f_` | Do you know? | Question2 |
 | `Staff_x0020_NameId` | Staff Name (person) | Registrant via `ensureuser` |
+| `EventID`, `EventName` | (added columns) | Event item ID / name |
+| `UserName`, `UserEmail` | (added columns) | Registrant name / email |
+| `ForSelf`, `SubmittedBy` | (added columns) | Self-flag / submitter email |
+| `LastAction`, `LastActionOn` | (added columns) | `Register`/`Switch`/`Cancel` + UTC timestamp |
 
 Caveats: the Session Time choices are hourly (9:00am–3:00pm), so events
 syncing to this list should use 60-minute slots in that window
 (anything else, e.g. `9:30am`, is rejected by the choice column); blank
 choice values are sent as `null` (field cleared) to avoid 400s; the
-read-only calculated `TImeSlot` column is never written.
+read-only calculated `TImeSlot` column is never written — and note the
+full slot label is deliberately **not** mirrored, because a `TimeSlot`
+contract column can't coexist with the list's calculated `TImeSlot`
+(SharePoint blocks near-duplicate names and the calculated column is
+read-only).
 
 **Extending to a new optional column:** add another chained Compose
 after `Payload_final` following the same
@@ -478,11 +486,11 @@ Workflows/*.json        <- one per flow
 
 Checklist for every rebuild:
 
-1. **Bump `<Version>` in `solution.xml`** (e.g. `1.0.0.16`) â€” Dataverse
+1. **Bump `<Version>` in `solution.xml`** (e.g. `1.0.0.17`) â€” Dataverse
    may reject importing the same version over itself.
 2. Zip the three XML files + the `Workflows/` folder (folder structure
    preserved, files at root).
-3. Name the zip to match: `EventSessionFlows_NoTemplates_1_0_0_16.zip`.
+3. Name the zip to match: `EventSessionFlows_NoTemplates_1_0_0_17.zip`.
 
 ### 5.3 Adding a brand-new flow to the solution
 

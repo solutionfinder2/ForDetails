@@ -30,7 +30,7 @@ package in your environment. Same seven flows, same IDs.
 
 > Do **not** upload these zips under **Solutions â†’ Import solution** â€”
 > that page only accepts the solution package
-> (`../EventSessionFlows_NoTemplates_1_0_0_16.zip`) and fails these with
+> (`../EventSessionFlows_NoTemplates_1_0_0_17.zip`) and fails these with
 > "The solution file is invalid".
 
 ## After all seven are imported

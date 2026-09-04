@@ -13,7 +13,7 @@ Follow the documents in this order:
 |---|---|---|
 | 1 | **`DEPLOYMENT.md`** | The complete step-by-step deployment: lists â†’ flows â†’ app â†’ configuration â†’ smoke test |
 | 2 | `SharePoint/` | Scripts that create the lists and columns (`RUN-SCRIPT.md` explains how to run them) |
-| 3 | `Flow/` | The flow solution zip (v1.0.0.16, 7 flows) + legacy per-flow packages + `MANUAL-FLOWS.md` (build-by-hand guide) |
+| 3 | `Flow/` | The flow solution zip (v1.0.0.17, 7 flows) + legacy per-flow packages + `MANUAL-FLOWS.md` (build-by-hand guide) |
 | 4 | `App/` | `OnStart.txt` and the three screen YAML files to paste into a new canvas app |
 | 5 | `Docs/LISTS.md` | **List metadata reference** â€” every list, every column, types, choices, and the external-list contract |
 | 6 | `Docs/SOP.md` | Standard operating procedures for admins (promote an event, roles, external list, reportsâ€¦) |
@@ -50,7 +50,7 @@ WeeklySessionRegistration-Minimal-PROD/
 â”‚     â”œâ”€ scrEventQuickReg.yaml
 â”‚     â””â”€ scrAdmin.yaml
 â”œâ”€ Flow/
-â”‚  â”œâ”€ EventSessionFlows_NoTemplates_1_0_0_16.zip   <- solution import (preferred)
+â”‚  â”œâ”€ EventSessionFlows_NoTemplates_1_0_0_17.zip   <- solution import (preferred)
 â”‚  â”œâ”€ Packages/                   <- legacy per-flow zips (fallback) + bundle
 â”‚  â””â”€ MANUAL-FLOWS.md             <- click-by-click designer guide
 â”œâ”€ SharePoint/
