@@ -1,15 +1,15 @@
-# Deployment Runbook — Minimal Edition
+﻿# Deployment Runbook â€” Minimal Edition
 
 Step-by-step guide to deploy the minimal (3-screen) Weekly Session
 Registration app into a new environment/tenant. Total time: roughly
-60–90 minutes. Do the phases **in order** — the app expects the lists
+60â€“90 minutes. Do the phases **in order** â€” the app expects the lists
 and flows to exist before you paste the screens.
 
 Full column-by-column list metadata lives in **`Docs/LISTS.md`**.
 
 ---
 
-## Phase 0 — Prerequisites
+## Phase 0 â€” Prerequisites
 
 - A SharePoint site to host the lists (you need at least **Edit** on it;
   the list-creation scripts need **Sites.Manage.All** consent via
@@ -18,12 +18,12 @@ Full column-by-column list metadata lives in **`Docs/LISTS.md`**.
   canvas apps.
 - Licenses/connectors: SharePoint, Office 365 Outlook, Office 365 Users,
   Office 365 Groups, OneDrive for Business, Microsoft Teams.
-- Windows PowerShell 5.1 or newer (for the Graph scripts — no modules
+- Windows PowerShell 5.1 or newer (for the Graph scripts â€” no modules
   needed).
 
 ---
 
-## Phase 1 — SharePoint lists
+## Phase 1 â€” SharePoint lists
 
 ### 1.1 Run the list creation script
 
@@ -43,15 +43,15 @@ lists with all their columns:
 | `EventSessionRegistration_SessionTimeSlots` | Yes |
 | `EventSessionRegistration_Registrations` | Yes |
 | `EventSessionRegistration_AppRoles` | Yes |
-| `EventSessionRegistration_EmailTemplates` | **No** — created by the script but ignored by this edition; you can leave it or delete it |
+| `EventSessionRegistration_EmailTemplates` | **No** â€” created by the script but ignored by this edition; you can leave it or delete it |
 
-It also seeds a **General Sessions** catch-all event and Mon–Fri time
+It also seeds a **General Sessions** catch-all event and Monâ€“Fri time
 slots for the number of weeks you chose (`-WeeksToSeed 0` for none).
 
 ### 1.2 Run the metadata columns script
 
 Adds the newer registration/event metadata columns (safe to run on lists
-that already have some of them — it skips existing columns):
+that already have some of them â€” it skips existing columns):
 
 ```powershell
 .\AddMetadataColumns-Graph.ps1 -SitePath "yourtenant.sharepoint.com:/sites/YourSite"
@@ -79,13 +79,13 @@ The most common miss is the three manual columns above.
 
 ---
 
-## Phase 2 — Power Automate flows
+## Phase 2 â€” Power Automate flows
 
 ### 2.1 Import the solution (preferred)
 
 1. [make.powerautomate.com](https://make.powerautomate.com) > pick the
    environment > **Solutions** > **Import solution**.
-2. Select `Flow/EventSessionFlows_NoTemplates_1_0_0_15.zip`.
+2. Select `Flow/EventSessionFlows_NoTemplates_1_0_0_16.zip`.
 3. Map the **four connections** when prompted: SharePoint, Office 365
    Outlook, OneDrive for Business, Microsoft Teams (create them if they
    don't exist).
@@ -100,25 +100,25 @@ The most common miss is the three manual columns above.
 
 > If the solution import fails in your environment (for example no
 > Dataverse database), fall back to the **legacy per-flow packages** in
-> `Flow/Packages/` — **My flows > Import > Import Package (Legacy)**,
+> `Flow/Packages/` â€” **My flows > Import > Import Package (Legacy)**,
 > one zip at a time. See `Flow/Packages/IMPORT.md`.
 
 ### 2.2 Post-import touch-ups
 
-1. **`EventSession_SessionReminderDaily`** — edit the flow, open the
+1. **`EventSession_SessionReminderDaily`** â€” edit the flow, open the
    **Get items** step, and change **Site Address** from the
    `https://yourtenant.sharepoint.com/...` placeholder to your real site;
    re-pick **List Name** = `EventSessionRegistration_Registrations`.
    This is the only flow with a hardcoded site.
-2. **`EventSession_ExportCSV`** — create the folder **`/CSV Exports`**
+2. **`EventSession_ExportCSV`** â€” create the folder **`/CSV Exports`**
    in the flow owner's OneDrive (the flow writes the CSV there before
    attaching it).
 3. The other flows receive site/list/recipient values from the app at
-   run time — nothing to edit.
+   run time â€” nothing to edit.
 
 ---
 
-## Phase 3 — Build the canvas app
+## Phase 3 â€” Build the canvas app
 
 ### 3.1 Create the app
 
@@ -135,7 +135,7 @@ The most common miss is the three manual columns above.
   `_SessionTimeSlots`, `_Registrations`, `_AppRoles`.
 - Connectors: **Office 365 Users**, **Office 365 Groups**.
 
-**Power Automate pane (⚡) > Add flow** — add the six app-called flows:
+**Power Automate pane (âš¡) > Add flow** â€” add the six app-called flows:
 
 - `EventSession_SendAppEmail`
 - `EventSession_ExportCSV`
@@ -144,7 +144,7 @@ The most common miss is the three manual columns above.
 - `EventSession_ShareEvent`
 - `EventSession_SyncExternalList`
 
-(Do **not** add `SessionReminderDaily` — it is schedule-only.)
+(Do **not** add `SessionReminderDaily` â€” it is schedule-only.)
 
 ### 3.3 App.OnStart and StartScreen
 
@@ -168,22 +168,22 @@ For each YAML file in `App/Screens/` (any order):
    `scrEventQuickReg`, `scrAdmin`).
 5. Delete the default `Screen1`.
 
-Screen `OnVisible` formulas are embedded in the YAML — there is nothing
+Screen `OnVisible` formulas are embedded in the YAML â€” there is nothing
 to set per screen.
 
 ### 3.5 First publish + app URL
 
 1. **Save** and **Publish** the app once.
-2. Get the app's web link: make.powerapps.com > **Apps** > **…** on the
+2. Get the app's web link: make.powerapps.com > **Apps** > **â€¦** on the
    app > **Details** > **Web link**.
 3. Back in Studio, open `App.OnStart` and paste the link into
-   `Set(varAppURL, "…")` — this powers the Share Event deep links
+   `Set(varAppURL, "â€¦")` â€” this powers the Share Event deep links
    (`?eventid=<ID>`).
 4. Save and publish again.
 
 ---
 
-## Phase 4 — Configuration
+## Phase 4 â€” Configuration
 
 ### 4.1 Bootstrap your admin role
 
@@ -227,27 +227,27 @@ Contract and optional columns are documented in `Docs/LISTS.md`.
 ### 4.4 Share the app
 
 Share the canvas app with your users (make.powerapps.com > Apps > Share).
-Data-source permission notes are in `Docs/SOP.md` § "Access and roles".
+Data-source permission notes are in `Docs/SOP.md` Â§ "Access and roles".
 
 ---
 
-## Phase 5 — Smoke test
+## Phase 5 â€” Smoke test
 
 Run through this list end to end before announcing the app:
 
 1. **Intro** loads and shows the promoted event card; "Get Started"
    opens the event page.
 2. **Register** for a session (fill phone, department, site, questions)
-   — you get the confirmation modal, a **confirmation email**, and a
+   â€” you get the confirmation modal, a **confirmation email**, and a
    **Teams card** with proper line breaks.
 3. The session's seat count decreased; the calendar day shows your green
    "Mine" count.
-4. **Switch** to another session — confirmation + email.
-5. **Register for someone else** (if enabled on the event) — the
+4. **Switch** to another session â€” confirmation + email.
+5. **Register for someone else** (if enabled on the event) â€” the
    registration appears under **My Registrations > For others**.
-6. **Cancel** — seat released, cancellation email received.
-7. **Add to Calendar** on a registration card — Outlook event created.
-8. **Share Event** — recipient gets the email; the link opens the app
+6. **Cancel** â€” seat released, cancellation email received.
+7. **Add to Calendar** on a registration card â€” Outlook event created.
+8. **Share Event** â€” recipient gets the email; the link opens the app
    directly on the event page (`?eventid=` deep link).
 9. **Admin**: create an event, add sessions, edit a session, watch the
    dashboard tiles update.
@@ -255,7 +255,7 @@ Run through this list end to end before announcing the app:
     Send Report delivers the email with attachment.
 11. If an event has SPSiteURL/SPListName set: register, switch, and
     cancel each appear in the **external list** (check `Status`,
-    `LastAction`, and — with scenario columns — `staff`, `author`,
+    `LastAction`, and â€” with scenario columns â€” `staff`, `author`,
     `hour` showing just the start time like `1:00pm`).
 12. Next morning: the **daily reminder** flow ran without errors
     (flow run history).
@@ -266,11 +266,11 @@ Run through this list end to end before announcing the app:
 
 | Symptom | Fix |
 |---|---|
-| Import error "…not declared in the solution file as a root component" | You are importing an old zip; use `EventSessionFlows_NoTemplates_1_0_0_15.zip` from this kit |
-| "The solution file is invalid…" on import | You picked a legacy per-flow zip under **Solutions > Import**. Legacy zips go through **My flows > Import > Import Package (Legacy)** |
+| Import error "â€¦not declared in the solution file as a root component" | You are importing an old zip; use `EventSessionFlows_NoTemplates_1_0_0_16.zip` from this kit |
+| "The solution file is invalidâ€¦" on import | You picked a legacy per-flow zip under **Solutions > Import**. Legacy zips go through **My flows > Import > Import Package (Legacy)** |
 | Emails don't arrive | Flow turned off, or the Outlook connection was mapped to the wrong account. Check the flow run history |
-| Teams card shows literal `\n` | Old flow version — re-import v1.0.0.15 |
-| App treats everyone as Admin | `EventSessionRegistration_AppRoles` is empty — add your Admin row (4.1) |
+| Teams card shows literal `\n` | Old flow version â€” re-import v1.0.0.16 |
+| App treats everyone as Admin | `EventSessionRegistration_AppRoles` is empty â€” add your Admin row (4.1) |
 | Deep link opens the Intro instead of the event | `StartScreen` formula not set (3.3), or `varAppURL` still blank (3.5) |
 | External list not updating | Event's SPSiteURL/SPListName blank or wrong; flow connection lacks Edit on the target site; check `EventSession_SyncExternalList` run history |
 | "List not found" errors in the app | List display names must match exactly, including the `EventSessionRegistration_` prefix |

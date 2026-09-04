@@ -161,3 +161,12 @@ writes these when the column exists — lists without them work unchanged.
 
 > Adding your own extra columns to an external list is fine — the flow
 > only touches the columns above.
+
+### Pre-existing lists with non-contract names
+
+The flow also ships with a **mapping profile** for one known existing
+list (signature column `Division_x0020__x0023_`): when detected, it
+sends a payload built for that list's internal names (`Status0`-style
+renamed columns, text dates, choice time slots) instead of the contract
+payload. Details in `FLOWS-DEVELOPER-GUIDE.md` § 3.7. To sync other
+non-contract lists, follow the same pattern.
