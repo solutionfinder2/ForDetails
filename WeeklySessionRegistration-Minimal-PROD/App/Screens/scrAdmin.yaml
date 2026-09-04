@@ -969,14 +969,14 @@ Screens:
                                       =If(CountRows(galAdminRegs.AllItems) = 0,
                                           Notify("Nothing to export with the current filters.", NotificationType.Warning),
                                           IfError(
-                                              Copy("Date" & Char(9) & "Time Slot" & Char(9) & "Event" & Char(9) & "Name" & Char(9) & "Email" & Char(9) & "Status" & Char(10) &
+                                              Copy("Date" & Char(9) & "Time Slot" & Char(9) & "Event" & Char(9) & "Name" & Char(9) & "Email" & Char(9) & "Status" & Char(9) & "Extra 1" & Char(9) & "Extra 2" & Char(10) &
                                                   Concat(galAdminRegs.AllItems,
                                                       Text(SessionDate, "yyyy-mm-dd") & Char(9) &
                                                       TimeSlot & Char(9) &
                                                       Coalesce(EventName, "") & Char(9) &
                                                       UserName & Char(9) &
                                                       UserEmail & Char(9) &
-                                                      Status,
+                                                      Status & Char(9) & Char(9),
                                                       Char(10))),
                                               Notify("Could not access the clipboard in this browser. Try running the app in a regular browser tab (not embedded in Teams or SharePoint).", NotificationType.Error),
                                               Notify("Copied " & CountRows(galAdminRegs.AllItems) & " rows. Open Excel and press Ctrl+V - each field lands in its own column. Use Save As to keep it as .xlsx or .csv.", NotificationType.Success)))
@@ -1000,13 +1000,13 @@ Screens:
                                           Notify("Nothing to export with the current filters.", NotificationType.Warning),
                                           With({res: EventSession_ExportCSV.Run(
                                                   "Registrations_" & Text(Now(), "yyyymmdd-hhmmss") & ".csv",
-                                                  "Date,Time Slot,Event,Name,Email,Status" & Char(10) &
+                                                  "Date,Time Slot,Event,Name,Email,Status,Extra 1,Extra 2" & Char(10) &
                                                   Concat(galAdminRegs.AllItems,
                                                       Text(SessionDate, "yyyy-mm-dd") & "," &
                                                       Substitute(TimeSlot, ",", " ") & "," &
                                                       Substitute(Coalesce(EventName, ""), ",", " ") & "," &
                                                       Substitute(UserName, ",", " ") & "," &
-                                                      UserEmail & "," & Status,
+                                                      UserEmail & "," & Status & ",,",
                                                       Char(10)))},
                                               If(IsBlank(res.fileurl),
                                                   Notify("Export failed - check the EventSession_ExportCSV flow run history.", NotificationType.Error),
@@ -1031,13 +1031,13 @@ Screens:
                                           Notify("Nothing to send with the current filters.", NotificationType.Warning),
                                           Set(varSendRptFile, "Registrations_" & Text(Now(), "yyyymmdd-hhmmss") & ".csv");
                                           Set(varSendRptCSV,
-                                              "Date,Time Slot,Event,Name,Email,Status" & Char(10) &
+                                              "Date,Time Slot,Event,Name,Email,Status,Extra 1,Extra 2" & Char(10) &
                                               Concat(galAdminRegs.AllItems,
                                                   Text(SessionDate, "yyyy-mm-dd") & "," &
                                                   Substitute(TimeSlot, ",", " ") & "," &
                                                   Substitute(Coalesce(EventName, ""), ",", " ") & "," &
                                                   Substitute(UserName, ",", " ") & "," &
-                                                  UserEmail & "," & Status,
+                                                  UserEmail & "," & Status & ",,",
                                                   Char(10)));
                                           Set(varSendRptRows, CountRows(galAdminRegs.AllItems));
                                           Clear(colSendRptTo);
@@ -1572,7 +1572,11 @@ Screens:
                                                         DayDate, DateAdd(first, Value - 1, TimeUnit.Days),
                                                         SlotCount, With({d: DateAdd(first, Value - 1, TimeUnit.Days)},
                                                             CountRows(Filter(colAdminSlots, SessionDate = d,
-                                                                IsBlank(cmbSessionEvent.Selected.ID) || EventID = cmbSessionEvent.Selected.ID))))))
+                                                                IsBlank(cmbSessionEvent.Selected.ID) || EventID = cmbSessionEvent.Selected.ID))),
+                                                        RemainDay, With({d: DateAdd(first, Value - 1, TimeUnit.Days)},
+                                                            Sum(Filter(colAdminSlots, SessionDate = d,
+                                                                IsBlank(cmbSessionEvent.Selected.ID) || EventID = cmbSessionEvent.Selected.ID),
+                                                                With({slotId: ID}, Max(0, Capacity - CountRows(Filter(colFutureRegs, SlotID = slotId)))))))))
                                         Children:
                                           - recACalCell:
                                               Control: ModernText@1.0.0
@@ -1615,10 +1619,12 @@ Screens:
                                           - lblACalDayDot:
                                               Control: ModernText@1.0.0
                                               Properties:
-                                                Text: =If(ThisItem.SlotCount > 0, Text(ThisItem.SlotCount), "")
-                                                X: =(Parent.TemplateWidth - 20) / 2
+                                                Text: |-
+                                                  =If(ThisItem.SlotCount > 0,
+                                                      ThisItem.SlotCount & " session" & If(ThisItem.SlotCount > 1, "s", ""), "")
+                                                X: =4
                                                 Y: =Parent.TemplateHeight - 26
-                                                Width: =18
+                                                Width: =Parent.TemplateWidth - 12
                                                 Height: =18
                                                 AutoHeight: =true
                                                 Size: =10
@@ -1626,11 +1632,15 @@ Screens:
                                                 Align: =Align.Center
                                                 Visible: =ThisItem.SlotCount > 0
                                                 Fill: |-
-                                                  =If(ThisItem.DayDate = varAdminCalSel,
-                                                      RGBA(255, 255, 255, 1), RGBA(21, 150, 106, 1))
+                                                  =If(ThisItem.DayDate = varAdminCalSel, RGBA(255, 255, 255, 1),
+                                                      ThisItem.RemainDay = 0, RGBA(253, 236, 238, 1),
+                                                      ThisItem.RemainDay <= 4, RGBA(255, 244, 223, 1),
+                                                      RGBA(233, 248, 241, 1))
                                                 Color: |-
-                                                  =If(ThisItem.DayDate = varAdminCalSel,
-                                                      RGBA(55, 63, 75, 1), RGBA(255, 255, 255, 1))
+                                                  =If(ThisItem.DayDate = varAdminCalSel, RGBA(55, 63, 75, 1),
+                                                      ThisItem.RemainDay = 0, RGBA(216, 75, 82, 1),
+                                                      ThisItem.RemainDay <= 4, RGBA(199, 122, 0, 1),
+                                                      RGBA(21, 150, 106, 1))
                                                 RadiusTopLeft: =9
                                                 RadiusTopRight: =9
                                                 RadiusBottomLeft: =9
@@ -1684,7 +1694,7 @@ Screens:
                                     - lblACalNoSlots:
                                         Control: ModernText@1.0.0
                                         Properties:
-                                          Text: ="No sessions on this day. Days with a green count badge have sessions."
+                                          Text: ="No sessions on this day. Badges - green = open, amber = nearly full, red = full, dark = selected."
                                           Height: =52
                                           AutoHeight: =true
                                           FillPortions: =0
@@ -2255,10 +2265,12 @@ Screens:
                                           - lblAEvCalDayDot:
                                               Control: ModernText@1.0.0
                                               Properties:
-                                                Text: =If(ThisItem.EvCount > 0, Text(ThisItem.EvCount), "")
-                                                X: =(Parent.TemplateWidth - 20) / 2
+                                                Text: |-
+                                                  =If(ThisItem.EvCount > 0,
+                                                      ThisItem.EvCount & " event" & If(ThisItem.EvCount > 1, "s", ""), "")
+                                                X: =4
                                                 Y: =Parent.TemplateHeight - 26
-                                                Width: =18
+                                                Width: =Parent.TemplateWidth - 12
                                                 Height: =18
                                                 AutoHeight: =true
                                                 Size: =10
@@ -2324,7 +2336,7 @@ Screens:
                                     - lblAEvCalNoEvents:
                                         Control: ModernText@1.0.0
                                         Properties:
-                                          Text: ="No events run on this day. Days with a green count badge have events."
+                                          Text: ="No events run on this day. Days with a count badge have events."
                                           Height: =52
                                           AutoHeight: =true
                                           FillPortions: =0
@@ -2892,7 +2904,7 @@ Screens:
                                     Text: ="DATE"
                                     X: =Parent.Width * 0.02
                                     Y: =0
-                                    Width: =Parent.Width * 0.10
+                                    Width: =Parent.Width * 0.09
                                     Height: =28
                                     AutoHeight: =true
                                     Size: =12
@@ -2901,9 +2913,9 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: ="TIME SLOT"
-                                    X: =Parent.Width * 0.13
+                                    X: =Parent.Width * 0.12
                                     Y: =0
-                                    Width: =Parent.Width * 0.14
+                                    Width: =Parent.Width * 0.12
                                     Height: =28
                                     AutoHeight: =true
                                     Size: =12
@@ -2912,9 +2924,9 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: ="EVENT"
-                                    X: =Parent.Width * 0.28
+                                    X: =Parent.Width * 0.25
                                     Y: =0
-                                    Width: =Parent.Width * 0.14
+                                    Width: =Parent.Width * 0.12
                                     Height: =28
                                     AutoHeight: =true
                                     Size: =12
@@ -2923,7 +2935,7 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: ="NAME"
-                                    X: =Parent.Width * 0.43
+                                    X: =Parent.Width * 0.38
                                     Y: =0
                                     Width: =Parent.Width * 0.14
                                     Height: =28
@@ -2934,9 +2946,9 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: ="EMAIL"
-                                    X: =Parent.Width * 0.58
+                                    X: =Parent.Width * 0.53
                                     Y: =0
-                                    Width: =Parent.Width * 0.18
+                                    Width: =Parent.Width * 0.15
                                     Height: =28
                                     AutoHeight: =true
                                     Size: =12
@@ -2945,9 +2957,31 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: ="STATUS"
-                                    X: =Parent.Width * 0.77
+                                    X: =Parent.Width * 0.69
                                     Y: =0
-                                    Width: =Parent.Width * 0.10
+                                    Width: =Parent.Width * 0.08
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblRColExtra1:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="EXTRA 1"
+                                    X: =Parent.Width * 0.78
+                                    Y: =0
+                                    Width: =Parent.Width * 0.065
+                                    Height: =28
+                                    AutoHeight: =true
+                                    Size: =12
+                                    Color: =RGBA(104, 115, 138, 1)
+                              - lblRColExtra2:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: ="EXTRA 2"
+                                    X: =Parent.Width * 0.855
+                                    Y: =0
+                                    Width: =Parent.Width * 0.065
                                     Height: =28
                                     AutoHeight: =true
                                     Size: =12
@@ -3000,7 +3034,7 @@ Screens:
                                     Text: =Text(ThisItem.SessionDate, "mmm d, yyyy")
                                     X: =Parent.TemplateWidth * 0.02
                                     Y: =16
-                                    Width: =Parent.TemplateWidth * 0.10
+                                    Width: =Parent.TemplateWidth * 0.09
                                     Height: =22
                                     AutoHeight: =true
                                     Size: =13
@@ -3010,9 +3044,9 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: =ThisItem.TimeSlot
-                                    X: =Parent.TemplateWidth * 0.13
+                                    X: =Parent.TemplateWidth * 0.12
                                     Y: =16
-                                    Width: =Parent.TemplateWidth * 0.14
+                                    Width: =Parent.TemplateWidth * 0.12
                                     Height: =22
                                     AutoHeight: =true
                                     Size: =13
@@ -3021,20 +3055,53 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: =ThisItem.EventName
-                                    X: =Parent.TemplateWidth * 0.28
+                                    X: =Parent.TemplateWidth * 0.25
                                     Y: =16
-                                    Width: =Parent.TemplateWidth * 0.14
+                                    Width: =Parent.TemplateWidth * 0.12
                                     Height: =22
                                     AutoHeight: =true
                                     Size: =13
                                     Color: =RGBA(55, 63, 75, 1)
+                              - recRRowAv:
+                                  Control: ModernText@1.0.0
+                                  Properties:
+                                    Text: =Upper(Left(Trim(ThisItem.UserName), 1))
+                                    X: =Parent.TemplateWidth * 0.38
+                                    Y: =11
+                                    Width: =32
+                                    Height: =32
+                                    Size: =12
+                                    FontWeight: =FontWeight.Bold
+                                    Align: =Align.Center
+                                    VerticalAlign: =VerticalAlign.Middle
+                                    Fill: =RGBA(232, 234, 238, 1)
+                                    Color: =RGBA(55, 63, 75, 1)
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
+                              - imgRRowAv:
+                                  Control: Image
+                                  Properties:
+                                    Image: |-
+                                      =If(Lower(ThisItem.UserEmail) = Lower(User().Email) && !IsBlank(User().Image), User().Image,
+                                          IfError(Office365Users.UserPhotoV2(Lower(ThisItem.UserEmail)), Blank()))
+                                    X: =Parent.TemplateWidth * 0.38
+                                    Y: =11
+                                    Width: =32
+                                    Height: =32
+                                    ImagePosition: =ImagePosition.Fill
+                                    RadiusTopLeft: =16
+                                    RadiusTopRight: =16
+                                    RadiusBottomLeft: =16
+                                    RadiusBottomRight: =16
                               - lblRRowName:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: =ThisItem.UserName
-                                    X: =Parent.TemplateWidth * 0.43
+                                    X: =Parent.TemplateWidth * 0.38 + 40
                                     Y: =16
-                                    Width: =Parent.TemplateWidth * 0.14
+                                    Width: =Parent.TemplateWidth * 0.14 - 40
                                     Height: =22
                                     AutoHeight: =true
                                     Size: =13
@@ -3043,9 +3110,9 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: =ThisItem.UserEmail
-                                    X: =Parent.TemplateWidth * 0.58
+                                    X: =Parent.TemplateWidth * 0.53
                                     Y: =16
-                                    Width: =Parent.TemplateWidth * 0.18
+                                    Width: =Parent.TemplateWidth * 0.15
                                     Height: =22
                                     AutoHeight: =true
                                     Size: =12
@@ -3054,9 +3121,9 @@ Screens:
                                   Control: ModernText@1.0.0
                                   Properties:
                                     Text: =Upper(ThisItem.Status)
-                                    X: =Parent.TemplateWidth * 0.77
+                                    X: =Parent.TemplateWidth * 0.69
                                     Y: =14
-                                    Width: =Parent.TemplateWidth * 0.09
+                                    Width: =Parent.TemplateWidth * 0.08
                                     Height: =26
                                     AutoHeight: =true
                                     Size: =11
@@ -3988,13 +4055,46 @@ Screens:
                   ShowScrollbar: =false
                   Items: =Filter(colFutureRegs, SlotID = varDetailSlot.ID)
                 Children:
+                  - recDetailRegAv:
+                      Control: ModernText@1.0.0
+                      Properties:
+                        Text: =Upper(Left(Trim(ThisItem.UserName), 1))
+                        X: =0
+                        Y: =6
+                        Width: =32
+                        Height: =32
+                        Size: =12
+                        FontWeight: =FontWeight.Bold
+                        Align: =Align.Center
+                        VerticalAlign: =VerticalAlign.Middle
+                        Fill: =RGBA(232, 234, 238, 1)
+                        Color: =RGBA(55, 63, 75, 1)
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
+                  - imgDetailRegAv:
+                      Control: Image
+                      Properties:
+                        Image: |-
+                          =If(Lower(ThisItem.UserEmail) = Lower(User().Email) && !IsBlank(User().Image), User().Image,
+                              IfError(Office365Users.UserPhotoV2(Lower(ThisItem.UserEmail)), Blank()))
+                        X: =0
+                        Y: =6
+                        Width: =32
+                        Height: =32
+                        ImagePosition: =ImagePosition.Fill
+                        RadiusTopLeft: =16
+                        RadiusTopRight: =16
+                        RadiusBottomLeft: =16
+                        RadiusBottomRight: =16
                   - lblDetailRegName:
                       Control: ModernText@1.0.0
                       Properties:
                         Text: =ThisItem.UserName
-                        X: =0
+                        X: =44
                         Y: =4
-                        Width: =Parent.TemplateWidth
+                        Width: =Parent.TemplateWidth - 44
                         Height: =20
                         AutoHeight: =true
                         Size: =13
@@ -4004,9 +4104,9 @@ Screens:
                       Control: ModernText@1.0.0
                       Properties:
                         Text: =ThisItem.UserEmail
-                        X: =0
+                        X: =44
                         Y: =24
-                        Width: =Parent.TemplateWidth
+                        Width: =Parent.TemplateWidth - 44
                         Height: =18
                         AutoHeight: =true
                         Size: =12

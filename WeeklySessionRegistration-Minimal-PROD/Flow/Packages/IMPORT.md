@@ -1,4 +1,4 @@
-﻿# Import the flows via Package (Legacy) â€” fallback method
+# Import the flows via Package (Legacy) — fallback method
 
 Use these zips when **Solutions > Import solution** rejects the solution
 package in your environment. Same seven flows, same IDs.
@@ -20,7 +20,7 @@ package in your environment. Same seven flows, same IDs.
 
 1. Open [Power Automate](https://make.powerautomate.com) and select your
    environment.
-2. **My flows** â†’ **Import** â†’ **Import Package (Legacy)**.
+2. **My flows** → **Import** → **Import Package (Legacy)**.
 3. **Upload** one of the flow `.zip` files.
 4. Under the flow row, set **Import setup** to **Create as new**.
 5. Under related resources (SharePoint / Outlook / OneDrive / Teams),
@@ -28,19 +28,19 @@ package in your environment. Same seven flows, same IDs.
    **Save**.
 6. Click **Import**, then open the flow and **Turn on**.
 
-> Do **not** upload these zips under **Solutions â†’ Import solution** â€”
+> Do **not** upload these zips under **Solutions → Import solution** —
 > that page only accepts the solution package
 > (`../EventSessionFlows_NoTemplates_1_0_0_17.zip`) and fails these with
 > "The solution file is invalid".
 
 ## After all seven are imported
 
-1. **SessionReminderDaily only:** edit the flow â†’ **Get items** â†’ set
+1. **SessionReminderDaily only:** edit the flow → **Get items** → set
    **Site Address** to your SharePoint site (placeholder is
    `https://yourtenant.sharepoint.com/...`); List Name stays
    `EventSessionRegistration_Registrations`.
 2. Create the OneDrive folder **`/CSV Exports`** (used by ExportCSV).
-3. In Power Apps Studio, **Power Automate pane â†’ Add flow**:
+3. In Power Apps Studio, **Power Automate pane → Add flow**:
    - `EventSession_SendAppEmail`
    - `EventSession_ExportCSV`
    - `EventSession_AddToCalendar`
@@ -48,7 +48,7 @@ package in your environment. Same seven flows, same IDs.
    - `EventSession_ShareEvent`
    - `EventSession_SyncExternalList`
 
-   (Do not add SessionReminderDaily â€” it is schedule-only.)
+   (Do not add SessionReminderDaily — it is schedule-only.)
 
 ## Prefer building in the designer?
 

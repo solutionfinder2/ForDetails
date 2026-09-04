@@ -170,3 +170,67 @@ sends a payload built for that list's internal names (`Status0`-style
 renamed columns, text dates, choice time slots) instead of the contract
 payload. Details in `FLOWS-DEVELOPER-GUIDE.md` § 3.7. To sync other
 non-contract lists, follow the same pattern.
+
+### Preparing the legacy list — checklist (avoid flow errors)
+
+Do all of this **before** pointing an event at the list. Each missed
+item causes the specific failure noted.
+
+**1. Add these columns** (exact names and types — List settings >
+Create column):
+
+| Column to add | Type | If missing… |
+|---|---|---|
+| `RegistrationID` | Number (index it) | **Every run fails** — the flow's first query filters on it (`Find_existing_row` returns 400) |
+| `RegStatus` | Choice: `Confirmed`, `Cancelled` | Registration state can't be tracked — the list's own `Status` column is repurposed for the phone number |
+| `EventID` | Single line of text | Skipped silently (column-aware), but rows lose event context |
+| `EventName` | Single line of text | Same |
+| `UserName` | Single line of text | Same |
+| `UserEmail` | Single line of text | Same |
+| `ForSelf` | Single line of text | Same |
+| `SubmittedBy` | Single line of text | Same |
+| `LastAction` | Single line of text | Same |
+| `LastActionOn` | Date and time | Same |
+
+**2. Verify the existing columns:**
+
+- **`Division #`** must keep its internal name
+  (`Division_x0020__x0023_`) — it is the **signature** the flow uses to
+  detect this list. If it's renamed or deleted, the flow silently falls
+  back to the generic contract payload, which then 400s on this list's
+  required columns.
+- **`Pixel Number`** (internal name `Status`) is a *required* column;
+  the flow writes the registrant's phone number into it (and the app
+  form makes phone mandatory), so it is always satisfied. **Do not mark
+  any other column Required** unless the profile maps it — an unmapped
+  required column makes every create call fail with 400.
+- **`Session Time`** (internal name `Description`) is a Choice column:
+  its choices must include the hourly start times your events use, in
+  **lowercase with no spaces** — `9:00am`, `10:00am`, … `3:00pm` — or
+  fill-in choices must be enabled. Events syncing to this list should
+  use 60-minute slots between 9 AM and 3 PM; a `9:30am` start is
+  rejected by the choice column unless fill-in is on.
+- **`Yubikey`** (internal name `Rsa_x0020_token`) and **`Do you
+  know?`** receive `yes` / `no` (Question1/Question2, lowercased) —
+  keep exactly those two choice values, or enable fill-in. Blank
+  answers are sent as `null` (field cleared), which is always accepted.
+- **`Staff Name`** is a **Person** column (single selection). The
+  registrant's email must resolve in the tenant — a guest/external
+  address that `ensureuser` cannot resolve fails the run with a 500.
+- **Do not add a `TimeSlot` column.** The list already has a
+  calculated `TImeSlot` column, and SharePoint blocks the
+  near-duplicate name; the flow deliberately never writes the full
+  slot label to this list.
+- Calculated columns (like `TImeSlot`) are read-only — the flow never
+  touches them, and you can't map anything onto them.
+
+**3. Permissions:** the SharePoint connection owner (whoever owns the
+flow's SharePoint connection) needs **Edit** rights on the site.
+First-time registrants are added to the site's user list automatically
+by `ensureuser`.
+
+**4. Smoke test:** point one test event's `SPSiteURL`/`SPListName` at
+the list, run a register → switch → cancel cycle in the app, and check
+the flow's run history — the `Payload_send` Compose output shows
+exactly what was written, and the create/update action shows any 400
+with the offending column named in the response body.

@@ -244,6 +244,13 @@ Sends a report email with a CSV attachment (Admin screen).
 
        (`text_4` = fifth input `FileContent`)
 
+       > **Warning:** enter this via the *expression* (fx) tab — not as
+       > plain text, and not the `FileContent` dynamic token by itself.
+       > If `ContentBytes` holds the raw token, Outlook decodes the CSV
+       > text as base64 and the attachment arrives as unreadable
+       > gibberish. Re-picking the field from the dynamic-content panel
+       > later silently drops the expression and reintroduces the bug.
+
 4. **Respond to a Power App or flow** → `result` = `ok`.
 5. Save → turn **On**.
 

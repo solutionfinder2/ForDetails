@@ -1,4 +1,4 @@
-﻿# Importing the flows (Minimal edition)
+# Importing the flows (Minimal edition)
 
 `EventSessionFlows_NoTemplates_1_0_0_17.zip` is the flow package that
 pairs with the minimal app. It contains all **seven** flows, is
@@ -13,22 +13,22 @@ edition sends emails with hardcoded subject/body from the screens).
 | `EventSession_SendReportEmail` | Emails the registration report with CSV attached | Yes |
 | `EventSession_ShareEvent` | "Someone shared an event with you" email with deep link | Yes |
 | `EventSession_SyncExternalList` | Mirrors register/switch/cancel to an event's external list | Yes |
-| `EventSession_SessionReminderDaily` | Day-before reminder, 7 AM ET (email + Teams card) | **No** â€” schedule-only |
+| `EventSession_SessionReminderDaily` | Day-before reminder, 7 AM ET (email + Teams card) | **No** — schedule-only |
 
-## Import steps (solution â€” preferred)
+## Import steps (solution — preferred)
 
 1. [make.powerautomate.com](https://make.powerautomate.com) > pick the
    target environment > **Solutions** > **Import solution** > select the
    zip.
-2. Map the **four connections** when prompted â€” SharePoint, Office 365
-   Outlook, OneDrive for Business, Microsoft Teams â€” creating them if
+2. Map the **four connections** when prompted — SharePoint, Office 365
+   Outlook, OneDrive for Business, Microsoft Teams — creating them if
    needed. (The Teams connection posts the adaptive cards; if a recipient
    has no Teams, that step fails quietly and the flow still succeeds.)
 3. After import, open **`EventSession_SessionReminderDaily`** > Edit >
    **Get items** step > set **Site Address** to the site hosting the
    `EventSessionRegistration_*` lists (it ships with a
    `https://yourtenant.sharepoint.com/...` placeholder) and re-pick the
-   **List Name**. This is the only flow that needs it â€” the others get
+   **List Name**. This is the only flow that needs it — the others get
    their values from the app at run time.
 4. Create the folder **`/CSV Exports`** in the flow owner's OneDrive.
 5. Turn **all seven flows On**.
@@ -39,11 +39,11 @@ edition sends emails with hardcoded subject/body from the screens).
 
 Some environments (e.g. without a Dataverse database) reject hand-built
 solution zips. Use the **legacy per-flow packages** in `Packages/`
-instead â€” see `Packages/IMPORT.md`. Same flows, same IDs.
+instead — see `Packages/IMPORT.md`. Same flows, same IDs.
 
 ## Versioning
 
 Same solution unique name and flow IDs as the full project's NoTemplates
-build â€” import only one flow package per environment. Re-importing over
+build — import only one flow package per environment. Re-importing over
 an existing install replaces the flows in place; if Dataverse rejects a
 same-version import, bump `<Version>` in `solution.xml` and re-zip.

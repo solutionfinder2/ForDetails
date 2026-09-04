@@ -392,20 +392,55 @@ Screens:
                                           FontWeight: =FontWeight.Bold
                                           Align: =Align.Center
                                           Color: =RGBA(55, 63, 75, 1)
+                                    - recMyRegAv_EvQ:
+                                        Control: ModernText@1.0.0
+                                        Properties:
+                                          Text: =Upper(Left(Trim(ThisItem.UserName), 1))
+                                          X: =70
+                                          Y: =12
+                                          Width: =28
+                                          Height: =28
+                                          Size: =11
+                                          FontWeight: =FontWeight.Bold
+                                          Align: =Align.Center
+                                          VerticalAlign: =VerticalAlign.Middle
+                                          Fill: =RGBA(232, 234, 238, 1)
+                                          Color: =RGBA(55, 63, 75, 1)
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
+                                    - imgMyRegAv_EvQ:
+                                        Control: Image
+                                        Properties:
+                                          Image: |-
+                                            =If(Lower(ThisItem.UserEmail) = Lower(User().Email) && !IsBlank(User().Image), User().Image,
+                                                IfError(Office365Users.UserPhotoV2(Lower(ThisItem.UserEmail)), Blank()))
+                                          X: =70
+                                          Y: =12
+                                          Width: =28
+                                          Height: =28
+                                          ImagePosition: =ImagePosition.Fill
+                                          RadiusTopLeft: =14
+                                          RadiusTopRight: =14
+                                          RadiusBottomLeft: =14
+                                          RadiusBottomRight: =14
                                     - lblMyRegFor_EvQ:
                                         Control: ModernText@1.0.0
                                         Properties:
                                           Text: |-
-                                            ="For: " & ThisItem.UserName
-                                          X: =70
+                                            =If(Lower(ThisItem.UserEmail) = Lower(User().Email),
+                                                ThisItem.UserName & " (You)",
+                                                "For: " & ThisItem.UserName)
+                                          X: =104
                                           Y: =16
-                                          Width: =Parent.TemplateWidth - 200
+                                          Width: =Parent.TemplateWidth - 232
                                           Height: =20
                                           AutoHeight: =true
                                           Size: =11
                                           FontWeight: =FontWeight.Semibold
                                           Color: =RGBA(55, 63, 75, 1)
-                                          Visible: =Lower(ThisItem.UserEmail) <> Lower(User().Email)
+                                          Visible: =true
                                     - lblMyRegBadge_EvQ:
                                         Control: ModernText@1.0.0
                                         Properties:
@@ -2428,7 +2463,9 @@ Screens:
             - imgRegSelfAv_EvQ:
                 Control: Image
                 Properties:
-                  Image: =User().Image
+                  Image: |-
+                    =If(!IsBlank(User().Image), User().Image,
+                        IfError(Office365Users.UserPhotoV2(Lower(User().Email)), Blank()))
                   X: =34
                   Y: =406
                   Width: =36
@@ -2702,11 +2739,47 @@ Screens:
                   AutoHeight: =true
                   Size: =11
                   Color: =RGBA(104, 115, 138, 1)
+            - recRegStep2Av_EvQ:
+                Control: ModernText@1.0.0
+                Properties:
+                  Text: =Upper(Left(Trim(Coalesce(varRegTargetName, User().FullName)), 1))
+                  X: =24
+                  Y: =336
+                  Width: =40
+                  Height: =40
+                  Size: =15
+                  FontWeight: =FontWeight.Bold
+                  Align: =Align.Center
+                  VerticalAlign: =VerticalAlign.Middle
+                  Fill: =RGBA(232, 234, 238, 1)
+                  Color: =RGBA(55, 63, 75, 1)
+                  RadiusTopLeft: =20
+                  RadiusTopRight: =20
+                  RadiusBottomLeft: =20
+                  RadiusBottomRight: =20
+                  Visible: =varRegModalStep = 2
+            - imgRegStep2Av_EvQ:
+                Control: Image
+                Properties:
+                  Image: |-
+                    =With({tgt: Lower(Coalesce(varRegTargetEmail, Lower(User().Email)))},
+                        If(tgt = Lower(User().Email) && !IsBlank(User().Image), User().Image,
+                           IfError(Office365Users.UserPhotoV2(tgt), Blank())))
+                  X: =24
+                  Y: =336
+                  Width: =40
+                  Height: =40
+                  ImagePosition: =ImagePosition.Fill
+                  RadiusTopLeft: =20
+                  RadiusTopRight: =20
+                  RadiusBottomLeft: =20
+                  RadiusBottomRight: =20
+                  Visible: =varRegModalStep = 2
             - lblRegModalNameKey_EvQ:
                 Control: ModernText@1.0.0
                 Properties:
                   Text: ="Name"
-                  X: =40
+                  X: =76
                   Y: =332
                   Visible: =varRegModalStep = 2
                   Width: =120
@@ -2732,17 +2805,17 @@ Screens:
                 Control: ModernText@1.0.0
                 Properties:
                   Text: =""
-                  X: =40
+                  X: =76
                   Y: =366
                   Visible: =varRegModalStep = 2
-                  Width: =Parent.Width - 80
+                  Width: =Parent.Width - 116
                   Height: =1
                   Fill: =RGBA(238, 238, 238, 1)
             - lblRegModalMailKey_EvQ:
                 Control: ModernText@1.0.0
                 Properties:
                   Text: ="Email"
-                  X: =40
+                  X: =76
                   Y: =376
                   Visible: =varRegModalStep = 2
                   Width: =120
