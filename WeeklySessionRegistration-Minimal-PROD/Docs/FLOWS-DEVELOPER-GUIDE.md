@@ -1,4 +1,4 @@
-# Flows — Developer How-To Guide
+﻿# Flows — Developer How-To Guide
 
 A deep, action-by-action reference for the seven `EventSession_` Power
 Automate flows: what each one does internally, every trigger parameter,
@@ -47,10 +47,12 @@ Consequences when editing:
 - **Append** new parameters at the end, then in Studio remove and re-add
   the flow so it picks up the new signature, and update every call site.
 - Prefer keeping new parameters in the `required` array. Inputs left
-  **optional** (not in `required`) become *optional trailing
-  arguments* in `Run` — older call sites that omit them keep
-  working. SendAppEmail's `CalendarLink` uses this deliberately so
-  3-argument callers (cancellations, other editions) need no edits.
+  **optional** (not in `required`) are passed to `Run` inside a
+  *record* as the final argument, e.g.
+  `SendAppEmail.Run(to, subject, body, {text_3: link})` — older call
+  sites that omit the record keep working. SendAppEmail's
+  `CalendarLink` uses this deliberately so 3-argument callers
+  (cancellations, other editions) need no edits.
 
 ### 2.2 Connection references
 

@@ -3179,13 +3179,13 @@ Screens:
                                     "Time: " & varNewReg.TimeSlot & Char(10) &
                                     "Reference: WSR-" & Text(varNewReg.ID) &
                                     If(link = "", "", Char(10) & "Meeting link: " & link),
-                                    "https://outlook.office.com/calendar/0/action/compose?rru=addevent" &
+                                    {text_3: "https://outlook.office.com/calendar/0/action/compose?rru=addevent" &
                                         "&subject=" & EncodeUrl(Coalesce(varNewReg.EventName, "Session") & " - " & varNewReg.TimeSlot) &
                                         "&startdt=" & Text(calStart, "yyyy-mm-ddThh:mm:ss") &
                                         "&enddt=" & Text(calEnd, "yyyy-mm-ddThh:mm:ss") &
                                         "&location=" & EncodeUrl(Coalesce(varEventDetail.Location, "")) &
                                         "&body=" & EncodeUrl("Reference: WSR-" & Text(varNewReg.ID) &
-                                            If(link = "", "", " | Meeting link: " & link)))),
+                                            If(link = "", "", " | Meeting link: " & link))})),
                                 Notify("Registered, but the confirmation email could not be sent.", NotificationType.Warning))));
                         Set(varEvqSwitchRegID, 0);
                         Set(varEvqSwitchRegLabel, "");
